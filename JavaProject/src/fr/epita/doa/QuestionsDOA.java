@@ -54,7 +54,7 @@ public class QuestionsDOA {
 		if (!(question.getAnswer() == "" && question.getDifficulty() == -1 && question.getQuestion() == "")) {
 			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
 					"postgres", "");
-			String toBeUpdatedQuestions = "SELECT * FROM public.\"Questions\" where ";
+			String query = "SELECT * FROM public.\"Questions\" where ";
 
 			// check what values are to be updated
 			boolean[] areHere = new boolean[3];
@@ -64,19 +64,19 @@ public class QuestionsDOA {
 			// check for nulls and adding to query
 			if (question.getAnswer() != "") {
 				areHere[0] = true;
-				toBeUpdatedQuestions += "lower(answer) = lower(?) and ";
+				query += "lower(answer) = lower(?) and ";
 			}
 			if (question.getQuestion() != "") {
 				areHere[1] = true;
-				toBeUpdatedQuestions += "lower(question) = lower(?) and ";
+				query += "lower(question) = lower(?) and ";
 			}
 			if (question.getDifficulty() != -1) {
 				areHere[2] = true;
-				toBeUpdatedQuestions += "difficulty = ? and ";
+				query += "difficulty = ? and ";
 			}
-			toBeUpdatedQuestions = toBeUpdatedQuestions.substring(0, toBeUpdatedQuestions.length() - 4);
-			toBeUpdatedQuestions += ";";
-			PreparedStatement prepareQuestionStatement = connection.prepareStatement(toBeUpdatedQuestions);
+			query = query.substring(0, query.length() - 4);
+			query += ";";
+			PreparedStatement prepareQuestionStatement = connection.prepareStatement(query);
 			int count = 1;
 			if (areHere[0]) {
 				prepareQuestionStatement.setString(count, question.getAnswer());
@@ -114,9 +114,9 @@ public class QuestionsDOA {
 
 		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
 				"postgres", "");
-		String toBeUpdatedQuestions = "SELECT * FROM public.\"Questions\" ";
+		String query = "SELECT * FROM public.\"Questions\" ";
 
-		PreparedStatement prepareQuestionStatement = connection.prepareStatement(toBeUpdatedQuestions);
+		PreparedStatement prepareQuestionStatement = connection.prepareStatement(query);
 		ResultSet rs = prepareQuestionStatement.executeQuery();
 		int id = 0;
 		String quest = "";
@@ -137,9 +137,7 @@ public class QuestionsDOA {
 	public void createQuestion(Question questionWanted) throws Exception {
 
 		int id = getID(questionWanted.getQuestion());
-		RelationQuestionDAO qdao = new RelationQuestionDAO();
 
-		ChoiceDAO cdao = new ChoiceDAO();
 		if (id != 0) {
 
 			System.out.println("Question already exists");
@@ -184,9 +182,9 @@ public class QuestionsDOA {
 			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
 					"postgres", "");
 
-			String toBeUpdatedTopic = "DELETE FROM public.\"Questions\" WHERE id = " + id + ";";
-			PreparedStatement prepareTopicStatement = connection.prepareStatement(toBeUpdatedTopic);
-			prepareTopicStatement.executeUpdate();
+			String str = "DELETE FROM public.\"Questions\" WHERE id = " + id + ";";
+			PreparedStatement preparedStatement = connection.prepareStatement(str);
+			preparedStatement.executeUpdate();
 			connection.close();
 			System.out.println("Question Deleted");
 		}
@@ -222,7 +220,7 @@ public class QuestionsDOA {
 
 				Connection connection = DriverManager
 						.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
-				String toBeUpdatedQuestions = "UPDATE FROM public.\"Questions\" set ";
+				String toBeUpdatedQuestions = "UPDATE public.\"Questions\" set ";
 
 				// check what values are to be updated
 				boolean[] areHere = new boolean[3];
@@ -260,7 +258,7 @@ public class QuestionsDOA {
 				}
 
 				System.out.println(prepareQuestionStatement);
-				// prepareQuestionStatement.execute();
+				prepareQuestionStatement.execute();
 				connection.close();
 
 				System.out.println("Question Updated");
