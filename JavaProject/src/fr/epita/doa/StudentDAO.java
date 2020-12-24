@@ -16,9 +16,9 @@ public class StudentDAO {
 	public int getStudentId(Student student) throws Exception {
 		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
 				"postgres", "");
-		String toBeUpdatedQuestions = "SELECT id FROM public.\"Students\" where lower(first_name) = lower(?) and  lower(last_name) = lower(?) and  lower(gender) = lower(?) and  dob = ? ;";
+		String str = "SELECT id FROM public.\"Students\" where lower(first_name) = lower(?) and  lower(last_name) = lower(?) and  lower(gender) = lower(?) and  dob = ? ;";
 
-		PreparedStatement preparedStatement = connection.prepareStatement(toBeUpdatedQuestions);
+		PreparedStatement preparedStatement = connection.prepareStatement(str);
 
 		preparedStatement.setString(1, student.getFirst_name());
 		preparedStatement.setString(2, student.getLast_name());
@@ -65,7 +65,7 @@ public class StudentDAO {
 		
 		return new Student(id,first_name,last_name,dob.toLocalDate(),gender);
 	}
-	public ArrayList<Student> getStudentByDate(String method,int methodValue) throws Exception {
+	public ArrayList<Student> getStudentsByDate(String method,int methodValue) throws Exception {
 		ArrayList<Student> out = new ArrayList<>();
 		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
 				"postgres", "");
