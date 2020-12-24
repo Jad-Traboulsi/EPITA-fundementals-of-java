@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import fr.epita.classes.Question;
+import fr.epita.classes.Quiz;
 import fr.epita.classes.Student;
 import fr.epita.classes.Topic;
 import fr.epita.classes.Choice;
 import fr.epita.classes.FullQuestion;
 import fr.epita.doa.ChoiceDAO;
 import fr.epita.doa.QuestionsDOA;
+import fr.epita.doa.QuizDAO;
 import fr.epita.doa.RelationQuestionDAO;
 import fr.epita.doa.StudentDAO;
 import fr.epita.doa.TopicDAO;
@@ -80,9 +82,9 @@ public class Launcher {
 //		reldao.unRelateChoiceFromAll(choices[0]);
 //		System.out.println(reldao.getAllRelatedToTopic(topics[3]));
 
-		Student s1 = new Student("Nour","TR",LocalDate.of(1996, 4, 16), "m");
-		Student s2 = new Student("Jad","Traboulsi",LocalDate.of(1996, 4, 16), "m");
-		StudentDAO studentdao = new StudentDAO();
+//		Student s1 = new Student("Nour","TR",LocalDate.of(1996, 4, 16), "m");
+//		Student s2 = new Student("Jad","Traboulsi",LocalDate.of(1996, 4, 16), "m");
+//		StudentDAO studentdao = new StudentDAO();
 
 //		studentdao.updateStudent(s2, s1);
 //		studentdao.createStudent(s1);
@@ -92,5 +94,19 @@ public class Launcher {
 //		String method = "year";
 //		int methodValue = 1996;		
 	
+//		Quiz q1 = new Quiz("Java Programming 1");
+//		Quiz q2 = new Quiz("Advanced Java 1");
+//		
+//		QuizDAO qdao = new QuizDAO();
+//		
+//		
+//		qdao.createQuiz(q1);
+//		qdao.createQuiz(q2);
+//		
+//		for(Quiz i : qdao.getAllQuizes()) {
+//			System.out.println(i);
+//		}
+//		
+		
 	}
 }
