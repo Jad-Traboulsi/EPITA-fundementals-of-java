@@ -23,9 +23,9 @@ public class Launcher {
 	public static void main(String[] args) throws Exception {
 		
 
-//		QuestionsDOA qdoa = new QuestionsDOA();
-//		TopicDAO tdoa = new TopicDAO();
-//		ChoiceDAO cdoa = new ChoiceDAO();
+		QuestionsDOA qdoa = new QuestionsDOA();
+		TopicDAO tdoa = new TopicDAO();
+		ChoiceDAO cdoa = new ChoiceDAO();
 //		
 //
 //		Topic[]topics = new Topic[4];
@@ -40,7 +40,7 @@ public class Launcher {
 //		{
 //			System.out.println(i);
 //		}
-//		//tdoa.deleteTopic(topics[1]);
+//		tdoa.deleteTopic(topics[1]);
 //		
 //
 //		Choice[]choices = new Choice[3];
@@ -74,13 +74,12 @@ public class Launcher {
 //		
 //		FullQuestion full = new FullQuestion(q, topics, choices);
 //		
-//		RelationQuestionDAO reldao = new RelationQuestionDAO();
+		RelationQuestionDAO reldao = new RelationQuestionDAO();
 //		
 //		reldao.createFullQuestion(full);
 //		reldao.unRelateQuestionFromAll(full.getQuestion());
 //		System.out.println(reldao.getAllRelatedToTopic(topics[3]));
 //		reldao.unRelateChoiceFromAll(choices[0]);
-//		System.out.println(reldao.getAllRelatedToTopic(topics[3]));
 
 //		Student s1 = new Student("Nour","TR",LocalDate.of(1996, 4, 16), "m");
 //		Student s2 = new Student("Jad","Traboulsi",LocalDate.of(1996, 4, 16), "m");
@@ -91,22 +90,23 @@ public class Launcher {
 //		System.out.println(studentdao.getStudentId(s1));
 //		
 //		System.out.println(studentdao.getStudent(s1));
-//		String method = "year";
-//		int methodValue = 1996;		
 	
 //		Quiz q1 = new Quiz("Java Programming 1");
 //		Quiz q2 = new Quiz("Advanced Java 1");
-//		
+		
 //		QuizDAO qdao = new QuizDAO();
-//		
-//		
+		
+	
 //		qdao.createQuiz(q1);
 //		qdao.createQuiz(q2);
-//		
+
 //		for(Quiz i : qdao.getAllQuizes()) {
 //			System.out.println(i);
 //		}
-//		
+		for(FullQuestion i :reldao.getAll()) {
+			System.out.println(i);
+		}
+	
 		
 	}
 }
