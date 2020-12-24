@@ -229,7 +229,7 @@ public class RelationQuestionDAO {
 	}
 
 	// get all topics and choices related to question
-	private FullQuestion getAllRelatedToQuestion(Question quest) throws Exception {
+	public FullQuestion getAllRelatedToQuestion(Question quest) throws Exception {
 		QuestionsDOA qdao = new QuestionsDOA();
 		int question_id = qdao.getID(quest.getQuestion());
 
@@ -295,7 +295,40 @@ public class RelationQuestionDAO {
 
 		return out;
 	}
+	
+	public ArrayList<FullQuestion> getAll() throws Exception{
+		ArrayList<FullQuestion> out = new ArrayList<>();
+		QuestionsDOA qdao = new QuestionsDOA();
+		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
+				"postgres", "");
+		String query = "SELECT id_question FROM public.\"Relation_Questions_Topics\";";
+		PreparedStatement prepareQuestionStatement = connection.prepareStatement(query);
+		ResultSet rs = prepareQuestionStatement.executeQuery();
+		int id = 0;
+		int temp = 0;
+		while (rs.next()) {
+			id = rs.getInt("id_question");
+			temp = id;
+			out.add(getAllRelatedToQuestion(qdao.getQuestion(id)));
+			break;
+		}
 
+		rs = prepareQuestionStatement.executeQuery();
+		while (rs.next()) {
+			id = rs.getInt("id_question");
+			if(temp != id) {
+				out.add(getAllRelatedToQuestion(qdao.getQuestion(id)));
+				temp = id;
+			}
+
+		}
+
+		
+		
+		
+		return out;
+	}
+	
 	// get topic
 	public ArrayList<Integer> getRelationTopicQuestion(int topicId) throws SQLException {
 		ArrayList<Integer> out = new ArrayList<>();
