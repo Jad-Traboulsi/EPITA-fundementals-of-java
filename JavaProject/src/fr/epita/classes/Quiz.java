@@ -46,6 +46,26 @@ public class Quiz {
 
 
 
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Quiz other = (Quiz) obj;
+		if (id != other.id)
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		return true;
+	}
+
 	@Override
 	public String toString() {
 		return "Quiz [id=" + id + ", title=" + title + "]";

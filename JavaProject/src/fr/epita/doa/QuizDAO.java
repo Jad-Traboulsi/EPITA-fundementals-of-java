@@ -73,7 +73,7 @@ public class QuizDAO {
 			throw new Exception("Title cannot be empty");
 		}
 		else if(getQuizId(quiz) != 0){
-			System.out.println("Quiz already exists");
+			throw new Exception("Quiz already exists");
 		}
 		else {
 			

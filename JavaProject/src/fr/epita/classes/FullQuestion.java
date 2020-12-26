@@ -17,7 +17,7 @@ public class FullQuestion {
 
 	public FullQuestion() {
 	}
-
+	
 	public Question getQuestion() {
 		return question;
 	}
@@ -40,6 +40,28 @@ public class FullQuestion {
 
 	public void setChoices(Choice[] choices) {
 		this.choices = choices;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		FullQuestion other = (FullQuestion) obj;
+		if (!Arrays.equals(choices, other.choices))
+			return false;
+		if (question == null) {
+			if (other.question != null)
+				return false;
+		} else if (!question.equals(other.question))
+			return false;
+		if (!Arrays.equals(topics, other.topics))
+			return false;
+		return true;
 	}
 
 	@Override

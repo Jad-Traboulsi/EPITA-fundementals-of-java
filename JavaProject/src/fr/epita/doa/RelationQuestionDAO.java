@@ -17,20 +17,71 @@ public class RelationQuestionDAO {
 	// for creating
 
 	public void createFullQuestion(FullQuestion full) throws Exception {
-		Question question = full.getQuestion();
-		QuestionsDOA qdoa = new QuestionsDOA();
-
-		int questionId = qdoa.getID(question.getQuestion());
-		if (questionId == 0) {
-			System.out.println("Question not found");
-			System.out.println("Creating Question");
-			qdoa.createQuestion(question);
+		boolean exists = false;
+		for (Choice i: full.getChoices()){
+			if(i.getChoice().equals(full.getQuestion().getAnswer())) {
+				exists = true;
+				break;
+				
+			}
 		}
-		for (Topic i : full.getTopics()) {
-			relateTopicToQuestion(question, i);
+		if(exists) {
+			Question question = full.getQuestion();
+			QuestionsDOA qdoa = new QuestionsDOA();
+			TopicDAO tdao = new TopicDAO();
+			ChoiceDAO cdao = new ChoiceDAO();
+			int questionId = qdoa.getID(question.getQuestion());
+			if (questionId == 0) {
+				System.out.println("Question not found");
+				System.out.println("Creating Question");
+				qdoa.createQuestion(question);
+				questionId = qdoa.getID(question.getQuestion());
+			}
+			else {
+				throw new Exception("Question Already Exists");
+			}
+			for (Topic i : full.getTopics()) {
+				int topicId = tdao.getID(i.getTopic());
+				if(topicId == 0) {
+					tdao.createTopic(i);
+					topicId = tdao.getID(i.getTopic());
+				}
+				System.out.println("Creating topic relation");
+	
+				Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
+						"postgres", "");
+	
+				String inserting = "INSERT INTO public.\"Relation_Questions_Topics\"(id_question,id_topic) VALUES (?,?);";
+				PreparedStatement insertingStatement = connection.prepareStatement(inserting);
+				insertingStatement.setInt(1, questionId);
+				insertingStatement.setInt(2, topicId);
+				insertingStatement.execute();
+				connection.close();
+				System.out.println("Topic Relation Created");
+			}
+			for (Choice i : full.getChoices()) {
+				int choiceId = cdao.getID(i.getChoice());
+				if(choiceId == 0) {
+					cdao.createChoice(i);
+					choiceId = cdao.getID(i.getChoice());
+				}
+	
+				System.out.println("Creating choice relation");
+	
+				Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
+						"postgres", "");
+	
+				String inserting = "INSERT INTO public.\"Relation_Questions_Choices\"(id_question,id_choice) VALUES (?,?);";
+				PreparedStatement insertingStatement = connection.prepareStatement(inserting);
+				insertingStatement.setInt(1, questionId);
+				insertingStatement.setInt(2, choiceId);
+				insertingStatement.execute();
+				connection.close();
+				System.out.println("Choice Relation Created");
+			}
 		}
-		for (Choice i : full.getChoices()) {
-			relateChoiceToQuestion(question, i);
+		else {
+			throw new Exception("Answer not in choices");
 		}
 	
 	}
@@ -132,6 +183,7 @@ public class RelationQuestionDAO {
 	}
 
 	// for adding relation
+	
 	public void relateTopicToQuestion(Question question, Topic topic) throws Exception {
 
 		FullQuestion full = getAllRelatedToQuestion(question);
@@ -146,13 +198,16 @@ public class RelationQuestionDAO {
 		if (questionId == 0) {
 			throw new Exception("Question not found in database");
 		} else if (topicId == 0) {
-			throw new Exception(topic.getTopic() + " is not found in the database");
+
+				throw new Exception(topic.getTopic() + " is not found in the database");
+			
 		} else {
 			for (Topic i : topics) {
 				int topicIdInArray = tdao.getID(i.getTopic());
 				if (topicIdInArray == topicId) {
 					exists = true;
 					System.out.println("Topic Relation already exists");
+					break;
 				}
 			}
 		}
@@ -191,7 +246,9 @@ public class RelationQuestionDAO {
 		} else if (choiceId == 0) {
 			throw new Exception(choice.getChoice() + " is not found in the database");
 		} else if(choiceAnswerIdFound == 0) {
-			throw new Exception("Answer not found in database");
+			
+				throw new Exception(question.getAnswer()+" Answer not found in database");				
+			
 			
 		}else {
 			for (Choice i : choices) {
@@ -312,7 +369,6 @@ public class RelationQuestionDAO {
 			out.add(getAllRelatedToQuestion(qdao.getQuestion(id)));
 			break;
 		}
-
 		rs = prepareQuestionStatement.executeQuery();
 		while (rs.next()) {
 			id = rs.getInt("id_question");
