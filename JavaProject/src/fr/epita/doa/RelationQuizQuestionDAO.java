@@ -241,18 +241,11 @@ public class RelationQuizQuestionDAO {
 	}
 	// print on text
 	public void outOnText(FullQuiz fq) throws Exception{
-
+		QuizDAO quizDAO = new QuizDAO();
 		File file = new File("./"+fq.getQuiz().getTitle()+".txt");
-
-
-
-		
 		boolean fileExists = file.exists();
-		
 		if(!fileExists)
 			file.createNewFile();
-		
-		
 
 		FileWriter fr = new FileWriter(file,false);
 		String lineSep = System.getProperty("line.separator");
@@ -260,6 +253,8 @@ public class RelationQuizQuestionDAO {
 		fr.append("ID:________"+lineSep);
 		fr.append(lineSep);
 		fr.append(fq.getQuiz().getTitle()+" Quiz");
+		fr.append(lineSep);
+		fr.append("Quiz ID: "+quizDAO.getQuizId(fq.getQuiz()));
 		fr.append(lineSep);
 		fr.append(lineSep);
 		fr.append(lineSep);
@@ -291,5 +286,14 @@ public class RelationQuizQuestionDAO {
 		fr.close();
 	
 
+	}
+	public int totalGradeOfQuiz(FullQuiz fq) throws Exception{
+		int total = 0;
+		
+		for(FullQuestion i : fq.getFullQuestion()) {
+			total+=i.getQuestion().getDifficulty();
+		}
+		
+		return total;
 	}
 }

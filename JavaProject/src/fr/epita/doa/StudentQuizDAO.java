@@ -97,8 +97,7 @@ public class StudentQuizDAO {
 		}		
 		else if(quizId== 0){
 			throw new Exception("Quiz doesnt exist");
-		}
-		else {
+		}else {
 			StudentAnswersDAO studentAnswerdao = new StudentAnswersDAO();
 			Hashtable<FullQuestion,String> answers =  studentAnswerdao.getStudentAnswers(student,fq);
 			int studentGrade = 0;
@@ -163,39 +162,5 @@ public class StudentQuizDAO {
 		return grade;
 		
 	}
-	public int totalMax(Student student,FullQuiz fq) throws Exception{
-		StudentDAO sdao =  new StudentDAO();
-		QuizDAO qdao = new QuizDAO();
-		QuestionsDOA questdao = new QuestionsDOA();
-		int max = 0;
 
-		int studentId = sdao.getStudentId(student) ;
-		int quizId = qdao.getQuizId(fq.getQuiz());
-		
-		if(studentId== 0){
-			throw new Exception("Student doesnt exist");
-		}		
-		else if(quizId== 0){
-			throw new Exception("Quiz doesnt exist");
-		}
-		else {
-
-			StudentAnswersDAO studentAnswerdao = new StudentAnswersDAO();
-			Hashtable<FullQuestion,String> answers =  studentAnswerdao.getStudentAnswers(student,fq);
-			Enumeration<FullQuestion> keys = answers.keys();
-			while(keys.hasMoreElements()) {
-				FullQuestion key = keys.nextElement();
-				
-				String questionAnswer = key.getQuestion().getAnswer();
-				String studentAnswer =answers.get(key);
-				max+=key.getQuestion().getDifficulty();
-				
-			}
-
-			
-			
-		}
-		return max;
-		
-	}
 }

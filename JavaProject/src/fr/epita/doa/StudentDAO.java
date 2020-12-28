@@ -35,18 +35,16 @@ public class StudentDAO {
 		return id;
 	}
 	
-	public Student getStudent(Student student) throws Exception {
+	public Student getStudentByName(Student student) throws Exception {
+
 		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
 				"postgres", "");
-		String toBeUpdatedQuestions = "SELECT * FROM public.\"Students\" where lower(first_name) = lower(?) and  lower(last_name) = lower(?) and  lower(gender) = lower(?) and  dob = ? and id = ?;";
+		String toBeUpdatedQuestions = "SELECT * FROM public.\"Students\" where lower(first_name) = lower(?) and  lower(last_name) = lower(?);";
 
 		PreparedStatement preparedStatement = connection.prepareStatement(toBeUpdatedQuestions);
 
 		preparedStatement.setString(1, student.getFirst_name());
 		preparedStatement.setString(2, student.getLast_name());
-		preparedStatement.setString(3, student.getGender());
-		preparedStatement.setDate(4,Date.valueOf(student.getDob()));
-		preparedStatement.setInt(5,student.getId());
 
 		ResultSet rs = preparedStatement.executeQuery();
 		int id = 0;

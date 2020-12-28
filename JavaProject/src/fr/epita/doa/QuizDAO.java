@@ -45,6 +45,8 @@ public class QuizDAO {
 	
 		return title;
 	}
+
+	
 	
 	public ArrayList<Quiz> getAllQuizes() throws Exception{
 		ArrayList<Quiz> out = new ArrayList<>();

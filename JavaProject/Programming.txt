@@ -2,15 +2,16 @@ Name:________
 ID:________
 
 Programming Quiz
+Quiz ID: 9
 
 
 1. What is this course's name?	(1 pt(s))
-	1. Introduction to Java
-	2. Introduction to python
+	1. Introduction to python
+	2. Introduction to Java
 	3. Introduction to C++
 
 2. What is your favorite programming language	(1 pt(s))
 	1. Python
-	2. C++
-	3. Java
+	2. Java
+	3. C++
 
