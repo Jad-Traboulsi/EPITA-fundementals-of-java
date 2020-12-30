@@ -13,7 +13,9 @@ import fr.epita.classes.Question;
 import fr.epita.classes.Topic;
 
 public class RelationQuestionDAO {
-
+	String database = "jdbc:postgresql://localhost:5432/fundementals-of-java";
+	String username = "postgres";
+	String password = "";
 	// check if answer in choices
 	
 	public boolean answerInChoices(FullQuestion full) throws Exception{
@@ -54,8 +56,7 @@ public class RelationQuestionDAO {
 				}
 				System.out.println("Creating topic relation");
 	
-				Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-						"postgres", "");
+				Connection connection = DriverManager.getConnection(database, username, password);
 	
 				String inserting = "INSERT INTO public.\"Relation_Questions_Topics\"(id_question,id_topic) VALUES (?,?);";
 				PreparedStatement insertingStatement = connection.prepareStatement(inserting);
@@ -74,8 +75,7 @@ public class RelationQuestionDAO {
 	
 				System.out.println("Creating choice relation");
 	
-				Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-						"postgres", "");
+				Connection connection = DriverManager.getConnection(database, username, password);
 	
 				String inserting = "INSERT INTO public.\"Relation_Questions_Choices\"(id_question,id_choice) VALUES (?,?);";
 				PreparedStatement insertingStatement = connection.prepareStatement(inserting);
@@ -107,8 +107,7 @@ public class RelationQuestionDAO {
 		} else {
 			if (topicIds.size() > 0) {
 
-				Connection connection = DriverManager
-						.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
+				Connection connection = DriverManager.getConnection(database, username, password);
 				for (int i : topicIds) {
 					String deleting = "delete from public.\"Relation_Questions_Topics\" where id_topic = ? ;";
 					PreparedStatement deletingStatement = connection.prepareStatement(deleting);
@@ -120,8 +119,7 @@ public class RelationQuestionDAO {
 			}
 			if (choiceIds.size() > 0) {
 
-				Connection connection = DriverManager
-						.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
+				Connection connection = DriverManager.getConnection(database, username, password);
 				for (int i : choiceIds) {
 					String deleting = "delete from public.\"Relation_Questions_Choices\" where id_choice = ? ;";
 					PreparedStatement deletingStatement = connection.prepareStatement(deleting);
@@ -148,8 +146,7 @@ public class RelationQuestionDAO {
 			System.out.println("Topic not linked to any question");
 		} else {
 
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-					"postgres", "");
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String deleting = "delete from public.\"Relation_Questions_Topics\" where id_topic = ? ;";
 			PreparedStatement deletingStatement = connection.prepareStatement(deleting);
 			deletingStatement.setInt(1, topicId);
@@ -174,8 +171,7 @@ public class RelationQuestionDAO {
 			System.out.println("Choice Not linked to any question");
 		} else {
 
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-					"postgres", "");
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String deleting = "delete from public.\"Relation_Questions_Choices\" where id_choice = ? ;";
 			PreparedStatement deletingStatement = connection.prepareStatement(deleting);
 
@@ -203,8 +199,7 @@ public class RelationQuestionDAO {
 			System.out.println("Topic not linked to question");
 		} else {
 
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-					"postgres", "");
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String deleting = "delete from public.\"Relation_Questions_Topics\" where id_topic = ? and id_question = ?;";
 			PreparedStatement deletingStatement = connection.prepareStatement(deleting);
 			deletingStatement.setInt(1, topicId);
@@ -236,8 +231,7 @@ public class RelationQuestionDAO {
 			System.out.println("Choice not linked to question");
 		} else {
 
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-					"postgres", "");
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String deleting = "delete from public.\"Relation_Questions_Choices\" where id_choice = ? and id_question = ? ;";
 			PreparedStatement deletingStatement = connection.prepareStatement(deleting);
 
@@ -284,9 +278,8 @@ public class RelationQuestionDAO {
 		if (!exists) {
 			System.out.println("Creating topic relation");
 
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-					"postgres", "");
-
+			Connection connection = DriverManager.getConnection(database, username, password);
+			
 			String inserting = "INSERT INTO public.\"Relation_Questions_Topics\"(id_question,id_topic) VALUES (?,?);";
 			PreparedStatement insertingStatement = connection.prepareStatement(inserting);
 			insertingStatement.setInt(1, questionId);
@@ -341,9 +334,7 @@ public class RelationQuestionDAO {
 			
 			System.out.println("Creating choice relation");
 
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-					"postgres", "");
-
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String inserting = "INSERT INTO public.\"Relation_Questions_Choices\"(id_question,id_choice) VALUES (?,?);";
 			PreparedStatement insertingStatement = connection.prepareStatement(inserting);
 			insertingStatement.setInt(1, questionId);
@@ -426,8 +417,7 @@ public class RelationQuestionDAO {
 	public ArrayList<FullQuestion> getAll() throws Exception{
 		ArrayList<FullQuestion> out = new ArrayList<>();
 		QuestionsDOA qdao = new QuestionsDOA();
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-				"postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		String query = "SELECT id_question FROM public.\"Relation_Questions_Topics\";";
 		PreparedStatement prepareQuestionStatement = connection.prepareStatement(query);
 		ResultSet rs = prepareQuestionStatement.executeQuery();
@@ -459,8 +449,7 @@ public class RelationQuestionDAO {
 	public ArrayList<Integer> getRelationTopicQuestion(int topicId) throws SQLException {
 		ArrayList<Integer> out = new ArrayList<>();
 
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-				"postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		String query = "SELECT * FROM public.\"Relation_Questions_Topics\" where id_topic = ?;";
 		PreparedStatement prepareQuestionStatement = connection.prepareStatement(query);
 		prepareQuestionStatement.setInt(1, topicId);
@@ -477,8 +466,7 @@ public class RelationQuestionDAO {
 	public ArrayList<Integer> getRelationChoiceQuestion(int choiceId) throws SQLException {
 		ArrayList<Integer> out = new ArrayList<>();
 
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-				"postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		String query = "SELECT * FROM public.\"Relation_Questions_Choices\" where id_choice = ?;";
 		PreparedStatement prepareQuestionStatement = connection.prepareStatement(query);
 		prepareQuestionStatement.setInt(1, choiceId);
@@ -495,8 +483,7 @@ public class RelationQuestionDAO {
 	public ArrayList<Integer> getRelationQuestionChoice(int questionId) throws SQLException {
 		ArrayList<Integer> out = new ArrayList<>();
 
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-				"postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		String query = "SELECT * FROM public.\"Relation_Questions_Choices\" where id_question = ?;";
 		PreparedStatement prepareQuestionStatement = connection.prepareStatement(query);
 		prepareQuestionStatement.setInt(1, questionId);
@@ -513,8 +500,7 @@ public class RelationQuestionDAO {
 	public ArrayList<Integer> getRelationTopic(int questionId) throws SQLException {
 		ArrayList<Integer> out = new ArrayList<>();
 
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-				"postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		String query = "SELECT * FROM public.\"Relation_Questions_Topics\" where id_question = ?;";
 		PreparedStatement prepareQuestionStatement = connection.prepareStatement(query);
 		prepareQuestionStatement.setInt(1, questionId);
@@ -531,8 +517,7 @@ public class RelationQuestionDAO {
 	public ArrayList<Integer> getRelationChoice(int questionId) throws SQLException {
 		ArrayList<Integer> out = new ArrayList<>();
 
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-				"postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		String query = "SELECT * FROM public.\"Relation_Questions_Choices\" where id_question = ?;";
 		PreparedStatement prepareQuestionStatement = connection.prepareStatement(query);
 		prepareQuestionStatement.setInt(1, questionId);
