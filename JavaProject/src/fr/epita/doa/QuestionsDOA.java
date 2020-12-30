@@ -190,9 +190,10 @@ public class QuestionsDOA {
 		}
 	}
 
-	public void updateQuestion(String question, Question newQuestion) throws Exception {
-		if (question != "") {
-			int oldId = getID(question);
+	public void updateQuestion(Question question, Question newQuestion) throws Exception {
+		if (question.getQuestion() != "") {
+			
+			int oldId = getID(question.getQuestion());
 			int newId = getID(newQuestion.getQuestion());
 			Question oldQuestion = new Question();
 			if (oldId != 0) {
@@ -208,11 +209,11 @@ public class QuestionsDOA {
 			}
 			// check if choice update needed
 			else if ((oldQuestion.getAnswer().toLowerCase().equals(newQuestion.getAnswer().toLowerCase())
-					|| newQuestion.getQuestion().equals(""))
+					&& newQuestion.getQuestion().equals(""))
 					&& (oldQuestion.getQuestion().toLowerCase().equals(newQuestion.getQuestion().toLowerCase())
-							|| newQuestion.getQuestion().equals(""))
+							&& newQuestion.getQuestion().equals(""))
 					&& (oldQuestion.getDifficulty() == newQuestion.getDifficulty()
-							|| newQuestion.getDifficulty() == -1)) {
+							&& newQuestion.getDifficulty() == -1)) {
 				System.out.println("No Question Changed");
 			}
 			// update choice
@@ -257,7 +258,6 @@ public class QuestionsDOA {
 					count++;
 				}
 
-				System.out.println(prepareQuestionStatement);
 				prepareQuestionStatement.execute();
 				connection.close();
 
