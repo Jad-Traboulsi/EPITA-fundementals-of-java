@@ -11,11 +11,14 @@ import fr.epita.classes.Topic;
 
 
 public class TopicDAO {
+	String database = "jdbc:postgresql://localhost:5432/fundementals-of-java";
+	String username = "postgres";
+	String password = "";
+	
 	public int getID(String topic) throws SQLException{
 
 
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
-		
+		Connection connection = DriverManager.getConnection(database, username, password);
 		// Searching in topics if the topic already exists
 	
 		String query = "SELECT id FROM public.\"Topics\" where  lower(topic) = lower(?); ";
@@ -35,8 +38,7 @@ public class TopicDAO {
 	public String getTopic(int id) throws SQLException{
 
 
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
-		
+		Connection connection = DriverManager.getConnection(database, username, password);
 		// Searching in topics if the topic already exists
 		
 		String query = "SELECT topic FROM public.\"Topics\" where  id = ?; ";
@@ -62,8 +64,7 @@ public class TopicDAO {
 		if(id==0)
 		{
 
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
-			
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String inserting = "INSERT INTO public.\"Topics\"(topic) VALUES (?);";		
 			PreparedStatement insertingStatement = connection.prepareStatement(inserting);
 			insertingStatement.setString(1,topic.getTopic());
@@ -106,8 +107,7 @@ public class TopicDAO {
 		// update topic
 		else
 		{
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
-
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String toBeUpdatedTopic = "UPDATE public.\"Topics\" SET topic = ? where id ="+id+";";
 			PreparedStatement prepareTopicStatement = connection.prepareStatement(toBeUpdatedTopic);
 
@@ -134,8 +134,7 @@ public class TopicDAO {
 		// delete topic
 		else
 		{
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
-
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String toBeUpdatedTopic = "DELETE FROM public.\"Topics\" WHERE id = "+id+";";
 			PreparedStatement prepareTopicStatement = connection.prepareStatement(toBeUpdatedTopic);
 			prepareTopicStatement.executeUpdate();
@@ -164,8 +163,7 @@ public class TopicDAO {
 		
 
 
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
-		
+		Connection connection = DriverManager.getConnection(database, username, password);
 		// Searching in topics if the topic already exists
 	
 		String query = "SELECT * FROM public.\"Topics\" ";
