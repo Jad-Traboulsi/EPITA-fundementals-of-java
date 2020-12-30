@@ -13,6 +13,11 @@ import fr.epita.classes.FullQuiz;
 import fr.epita.classes.Student;
 
 public class StudentAnswersDAO {
+	String database = "jdbc:postgresql://localhost:5432/fundementals-of-java";
+	String username = "postgres";
+	String password = "";
+	
+	
 	public Hashtable<FullQuestion,String> getStudentAnswers(Student student,FullQuiz fq) throws Exception{
 		
 		Hashtable<FullQuestion,String> answers = new Hashtable<>();
@@ -31,8 +36,7 @@ public class StudentAnswersDAO {
 			throw new Exception("Quiz doesnt exist");
 		}
 		else {
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-					"postgres", "");
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String str = "SELECT * FROM public.\"Student_Answers\" where id_student = ? and id_quiz = ? ;";
 
 			PreparedStatement preparedStatement = connection.prepareStatement(str);
@@ -78,8 +82,7 @@ public class StudentAnswersDAO {
 			throw new Exception("Quiz doesnt exist");
 		}
 		else {
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
-			
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String inserting = "select * from public.\"Student_Answers\" where id_quiz = ? and id_student = ?;";
 			PreparedStatement preparedStatement = connection.prepareStatement(inserting);
 			preparedStatement.setInt(1, quizId);
@@ -112,8 +115,7 @@ public class StudentAnswersDAO {
 		
 		if(!isPresent(student, fq)) {
 
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
-				
+			Connection connection = DriverManager.getConnection(database, username, password);	
 			for(int i = 0;i< answers.size();i++) {
 
 				String inserting = "INSERT INTO public.\"Student_Answers\"(id_student, id_quiz, id_question, answer)VALUES (?,?,?, ?);";	
@@ -160,8 +162,7 @@ public class StudentAnswersDAO {
 		}
 		if(exists) {
 
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
-			
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String inserting = "update public.\"Student_Answers\" set answer = ? where id_student=? and id_quiz= ? and id_question = ?;";		
 
 			PreparedStatement insertingStatement = connection.prepareStatement(inserting);
