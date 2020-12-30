@@ -7,6 +7,7 @@ import java.util.Hashtable;
 import java.util.Random;
 import java.util.Scanner;
 
+
 import fr.epita.classes.Question;
 import fr.epita.classes.Quiz;
 import fr.epita.classes.Student;
@@ -88,6 +89,7 @@ public class Launcher {
 //		System.out.println(squizdao.getGrade(s1, fq));
 //		System.out.println(squizdao.totalMax(s1, fq));
 		menuUsingConsole();
+
 	}
 
 	public static void menuUsingConsole() throws Exception {
@@ -1159,5 +1161,5 @@ public class Launcher {
 		}
 
 	}
-
+	
 }
