@@ -10,10 +10,11 @@ import java.util.ArrayList;
 import fr.epita.classes.Question;
 
 public class QuestionsDOA {
-
+	String database = "jdbc:postgresql://localhost:5432/fundementals-of-java";
+	String username = "postgres";
+	String password = "";
 	public int getID(String questionTitle) throws Exception {
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-				"postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		String toBeUpdatedQuestions = "SELECT id FROM public.\"Questions\" where lower(question) = lower(?)";
 
 		PreparedStatement prepareQuestionStatement = connection.prepareStatement(toBeUpdatedQuestions);
@@ -29,8 +30,7 @@ public class QuestionsDOA {
 		return id;
 	}
 	public Question getQuestion(int id) throws Exception {
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-				"postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		String query = "SELECT * FROM public.\"Questions\" where id = ?;";
 		PreparedStatement prepareQuestionStatement = connection.prepareStatement(query);
 		prepareQuestionStatement.setInt(1, id);
@@ -52,8 +52,7 @@ public class QuestionsDOA {
 
 		ArrayList<Question> out = new ArrayList<>();
 		if (!(question.getAnswer() == "" && question.getDifficulty() == -1 && question.getQuestion() == "")) {
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-					"postgres", "");
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String query = "SELECT * FROM public.\"Questions\" where ";
 
 			// check what values are to be updated
@@ -112,8 +111,7 @@ public class QuestionsDOA {
 
 		ArrayList<Question> out = new ArrayList<>();
 
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-				"postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		String query = "SELECT * FROM public.\"Questions\" ";
 
 		PreparedStatement prepareQuestionStatement = connection.prepareStatement(query);
@@ -152,8 +150,7 @@ public class QuestionsDOA {
 		}else {
 
 				// inserting in table question
-				Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-						"postgres", "");
+				Connection connection = DriverManager.getConnection(database, username, password);
 				String query1 = "INSERT INTO public.\"Questions\"(question, answer, difficulty)VALUES (?, ?, ?); ";
 				PreparedStatement prepareStatement1 = connection.prepareStatement(query1);
 				prepareStatement1.setString(1, questionWanted.getQuestion());
@@ -179,8 +176,7 @@ public class QuestionsDOA {
 		}
 		// delete question
 		else {
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-					"postgres", "");
+			Connection connection = DriverManager.getConnection(database, username, password);
 
 			String str = "DELETE FROM public.\"Questions\" WHERE id = " + id + ";";
 			PreparedStatement preparedStatement = connection.prepareStatement(str);
@@ -219,8 +215,7 @@ public class QuestionsDOA {
 			// update choice
 			else {
 
-				Connection connection = DriverManager
-						.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
+				Connection connection = DriverManager.getConnection(database, username, password);
 				String toBeUpdatedQuestions = "UPDATE public.\"Questions\" set ";
 
 				// check what values are to be updated
