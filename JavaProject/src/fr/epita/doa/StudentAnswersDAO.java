@@ -96,7 +96,6 @@ public class StudentAnswersDAO {
 		StudentDAO sdao =  new StudentDAO();
 		QuizDAO qdao = new QuizDAO();
 		QuestionsDOA questdao = new QuestionsDOA();
-		boolean exists = false;
 		int studentId = sdao.getStudentId(student) ;
 		int quizId = qdao.getQuizId(fq.getQuiz());
 		
@@ -127,7 +126,7 @@ public class StudentAnswersDAO {
 			}
 			connection.close();
 			StudentQuizDAO studentQuizdao = new StudentQuizDAO();
-			studentQuizdao.setGrade(student, fq);
+			studentQuizdao.updateGrade(student, fq);
 		}
 	}
 	
@@ -163,7 +162,7 @@ public class StudentAnswersDAO {
 
 			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
 			
-			String inserting = "update public.\"Student_Answers\" answer = ? where id_student=? and id_quiz= ? and id_question = ?;";		
+			String inserting = "update public.\"Student_Answers\" set answer = ? where id_student=? and id_quiz= ? and id_question = ?;";		
 
 			PreparedStatement insertingStatement = connection.prepareStatement(inserting);
 			insertingStatement.setString(1, newAnswer);
