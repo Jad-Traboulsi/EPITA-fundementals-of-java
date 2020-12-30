@@ -10,7 +10,6 @@ public class Quiz {
 	
 	public Quiz(String title) {
 		super();
-		this.id = id;
 		this.title = title;
 	}
 	
