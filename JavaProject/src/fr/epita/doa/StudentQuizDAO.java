@@ -14,6 +14,10 @@ import fr.epita.classes.Quiz;
 import fr.epita.classes.Student;
 
 public class StudentQuizDAO {
+	String database = "jdbc:postgresql://localhost:5432/fundementals-of-java";
+	String username = "postgres";
+	String password = "";
+	
 	public boolean isPresent(Student student,FullQuiz fq)throws Exception{
 		boolean exists = false;
 		StudentDAO sdao =  new StudentDAO();
@@ -28,8 +32,7 @@ public class StudentQuizDAO {
 			throw new Exception("Quiz doesnt exist");
 		}
 		else {
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
-			
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String inserting = "select grade from public.\"Student_Quizes\" where id_quiz = ? and id_student = ?;";
 			PreparedStatement preparedStatement = connection.prepareStatement(inserting);
 			preparedStatement.setInt(1, quizId);
@@ -71,8 +74,7 @@ public class StudentQuizDAO {
 				}
 			}
 
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
-			
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String inserting = "INSERT INTO public.\"Student_Quizes\"(id_student, id_quiz, grade)VALUES (?,?,?);";
 			PreparedStatement insertingStatement = connection.prepareStatement(inserting);
 			insertingStatement.setInt(1, studentId);
@@ -113,8 +115,7 @@ public class StudentQuizDAO {
 				}
 			}
 
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
-			
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String inserting = "update public.\"Student_Quizes\" set grade= ? where id_student = ? and id_quiz = ?;";
 			PreparedStatement insertingStatement = connection.prepareStatement(inserting);
 			insertingStatement.setInt(1, studentGrade);
@@ -142,8 +143,7 @@ public class StudentQuizDAO {
 		}else {
 			
 
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
-			
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String inserting = "Insert public.\"Student_Quizes\" (grade,id_student,id_quiz) values (?,?,?);";
 			PreparedStatement insertingStatement = connection.prepareStatement(inserting);
 			insertingStatement.setInt(1, grade);
@@ -173,8 +173,7 @@ public class StudentQuizDAO {
 		}
 		else {
 
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
-			
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String inserting = "select grade from public.\"Student_Quizes\" where id_quiz = ? and id_student = ?;";
 			PreparedStatement preparedStatement = connection.prepareStatement(inserting);
 			preparedStatement.setInt(1, quizId);
@@ -201,8 +200,7 @@ public class StudentQuizDAO {
 		}
 		else {
 
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
-			
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String inserting = "select * from public.\"Student_Quizes\" where id_quiz = ?";
 			PreparedStatement preparedStatement = connection.prepareStatement(inserting);
 			preparedStatement.setInt(1, quizId);
@@ -239,8 +237,7 @@ public class StudentQuizDAO {
 		}		
 		else {
 
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
-			
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String inserting = "select id_quiz from public.\"Student_Quizes\" where grade = ? and id_student = ?;";
 			PreparedStatement preparedStatement = connection.prepareStatement(inserting);
 			preparedStatement.setInt(1, grade);
@@ -275,8 +272,7 @@ public class StudentQuizDAO {
 		}		
 		else {
 
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
-			
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String inserting = "select * from public.\"Student_Quizes\" where and id_student = ?;";
 			PreparedStatement preparedStatement = connection.prepareStatement(inserting);
 			preparedStatement.setInt(2, studentId);
