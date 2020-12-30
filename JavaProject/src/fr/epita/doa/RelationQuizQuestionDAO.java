@@ -6,15 +6,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Random;
 
 import fr.epita.classes.Choice;
 import fr.epita.classes.FullQuestion;
 import fr.epita.classes.FullQuiz;
-import fr.epita.classes.Question;
 import fr.epita.classes.Quiz;
 import fr.epita.classes.Topic;
 
@@ -179,8 +176,6 @@ public class RelationQuizQuestionDAO {
 	public ArrayList<FullQuiz> getAllQuizes() throws Exception{
 		ArrayList<FullQuiz> out = new ArrayList<>();
 		
-		RelationQuestionDAO rltnQuestion = new RelationQuestionDAO();
-		QuestionsDOA qdoa = new QuestionsDOA();
 		QuizDAO quizdao = new QuizDAO();
 		
 		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
@@ -226,7 +221,6 @@ public class RelationQuizQuestionDAO {
 			ArrayList<FullQuestion> questionsFound = new ArrayList<>();
 			RelationQuestionDAO rltnQuestion = new RelationQuestionDAO();
 			QuestionsDOA qdoa = new QuestionsDOA();
-			int temp = 0;
 			while (rs.next()) {
 				questionId = rs.getInt("id_question");
 				questionsFound.add(rltnQuestion.getAllRelatedToQuestion(qdoa.getQuestion(questionId)));
