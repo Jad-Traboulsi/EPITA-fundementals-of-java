@@ -16,6 +16,10 @@ import fr.epita.classes.Quiz;
 import fr.epita.classes.Topic;
 
 public class RelationQuizQuestionDAO {
+	String database = "jdbc:postgresql://localhost:5432/fundementals-of-java";
+	String username = "postgres";
+	String password = "";
+	
 	public void createFullQuiz(FullQuiz fullQuiz) throws Exception {
 		RelationQuestionDAO rltnqdao = new RelationQuestionDAO();
 		QuizDAO qdao = new QuizDAO();
@@ -95,8 +99,7 @@ public class RelationQuizQuestionDAO {
 		}
 		if(!exists){
 		
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-					"postgres", "");
+			Connection connection = DriverManager.getConnection(database, username, password);
 	
 			String inserting = "INSERT INTO public.\"Relation_Quizes_Questions\"(id_question,id_quiz) VALUES (?,?);";
 			PreparedStatement insertingStatement = connection.prepareStatement(inserting);
@@ -139,8 +142,7 @@ public class RelationQuizQuestionDAO {
 		}
 		if(exists){
 		
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-					"postgres", "");
+			Connection connection = DriverManager.getConnection(database, username, password);
 	
 			String inserting = "delete from public.\"Relation_Quizes_Questions\" where id = ?;";
 			PreparedStatement insertingStatement = connection.prepareStatement(inserting);
@@ -149,12 +151,12 @@ public class RelationQuizQuestionDAO {
 			connection.close();
 		}
 	}
+	
 	// get all related to quiz
 	public ArrayList<FullQuestion> getAllRelatedToQuiz(Quiz quiz)throws Exception{
 		ArrayList<FullQuestion> out = new ArrayList<>();
 		
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-				"postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		String str = "SELECT id_question FROM public.\"Relation_Quizes_Questions\" where id_quiz = ?;";
 
 		RelationQuestionDAO rltnQuestion = new RelationQuestionDAO();
@@ -178,8 +180,7 @@ public class RelationQuizQuestionDAO {
 		
 		QuizDAO quizdao = new QuizDAO();
 		
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-				"postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		String str = "SELECT * FROM public.\"Relation_Quizes_Questions\";";
 	
 		PreparedStatement preparedStatement = connection.prepareStatement(str);
@@ -209,8 +210,7 @@ public class RelationQuizQuestionDAO {
 			throw new Exception("Quiz "+quiz.getTitle() + " not found in database");
 		}
 		else {
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-					"postgres", "");
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String str = "SELECT id_question FROM public.\"Relation_Quizes_Questions\" where id_quiz = ?;";
 			
 			PreparedStatement preparedStatement = connection.prepareStatement(str);
@@ -233,6 +233,7 @@ public class RelationQuizQuestionDAO {
 		}
 		return out;
 	}
+	
 	// print on text
 	public void outOnText(FullQuiz fq) throws Exception{
 		QuizDAO quizDAO = new QuizDAO();
