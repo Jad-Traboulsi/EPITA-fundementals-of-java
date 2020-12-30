@@ -9,13 +9,13 @@ import java.sql.Date;
 
 import fr.epita.classes.Student;
 
-//SELECT * from public."Students" where DATE_PART('month', dob) = 3;
-//
-//Date d1 = Date.from(t1.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
 public class StudentDAO {
+	String database = "jdbc:postgresql://localhost:5432/fundementals-of-java";
+	String username = "postgres";
+	String password = "";
 	public int getStudentId(Student student) throws Exception {
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-				"postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		String str = "SELECT id FROM public.\"Students\" where lower(first_name) = lower(?) and  lower(last_name) = lower(?) and  lower(gender) = lower(?) and  dob = ? ;";
 
 		PreparedStatement preparedStatement = connection.prepareStatement(str);
@@ -37,8 +37,7 @@ public class StudentDAO {
 	
 	public Student getStudentByName(Student student) throws Exception {
 
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-				"postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		String toBeUpdatedQuestions = "SELECT * FROM public.\"Students\" where lower(first_name) = lower(?) and  lower(last_name) = lower(?);";
 
 		PreparedStatement preparedStatement = connection.prepareStatement(toBeUpdatedQuestions);
@@ -65,8 +64,7 @@ public class StudentDAO {
 	}
 	public ArrayList<Student> getStudentsByDate(String method,int methodValue) throws Exception {
 		ArrayList<Student> out = new ArrayList<>();
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-				"postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		String toBeUpdatedQuestions = "SELECT * FROM public.\"Students\" where DATE_PART(?, dob) = ?;";
 
 		PreparedStatement preparedStatement = connection.prepareStatement(toBeUpdatedQuestions);
@@ -93,8 +91,7 @@ public class StudentDAO {
 		return out;
 	}
 	public Student getStudentById(int idSearch) throws Exception {
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-				"postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		String toBeUpdatedQuestions = "SELECT * FROM public.\"Students\" where id = ?;";
 
 		PreparedStatement preparedStatement = connection.prepareStatement(toBeUpdatedQuestions);
@@ -120,8 +117,7 @@ public class StudentDAO {
 	}
 	public ArrayList<Student> getAllStudents() throws Exception {
 		ArrayList<Student> out = new ArrayList<>();
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-				"postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		String toBeUpdatedQuestions = "SELECT * FROM public.\"Students\";";
 
 		PreparedStatement preparedStatement = connection.prepareStatement(toBeUpdatedQuestions);
@@ -161,8 +157,7 @@ public class StudentDAO {
 		}
 		else {
 			
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
-			
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String inserting = "INSERT INTO public.\"Students\"(first_name, last_name, dob, gender)VALUES (?,?,?, ?);";		
 			PreparedStatement insertingStatement = connection.prepareStatement(inserting);
 			insertingStatement.setString(1, student.getFirst_name());
@@ -184,8 +179,7 @@ public class StudentDAO {
 		}
 		// delete student
 		else {
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-					"postgres", "");
+			Connection connection = DriverManager.getConnection(database, username, password);
 
 			String str = "DELETE FROM public.\"Students\" WHERE id = " + id + ";";
 			PreparedStatement preparedStatement = connection.prepareStatement(str);
@@ -212,8 +206,7 @@ public class StudentDAO {
 			System.out.println("Student already exists");
 		}
 		else {
-			Connection connection = DriverManager
-					.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String str = "UPDATE public.\"Students\" set first_name=?, last_name=?, dob=?, gender=? where id =?";
 			PreparedStatement insertingStatement = connection.prepareStatement(str);
 			insertingStatement.setString(1, newStudent.getFirst_name());
