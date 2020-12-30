@@ -11,11 +11,13 @@ import fr.epita.classes.Choice;
 
 
 public class ChoiceDAO {
-
+	String database = "jdbc:postgresql://localhost:5432/fundementals-of-java";
+	String username = "postgres";
+	String password = "";
 	public int getID(String choice) throws SQLException{
 
 
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		
 		// Searching in choices if the choice already exists
 	
@@ -36,7 +38,7 @@ public class ChoiceDAO {
 	public String getChoice(int id) throws SQLException{
 
 
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		
 		// Searching in choices if the choice already exists
 		
@@ -63,7 +65,7 @@ public class ChoiceDAO {
 		if(id==0)
 		{
 
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
+			Connection connection = DriverManager.getConnection(database, username, password);
 			
 			String inserting = "INSERT INTO public.\"Choices\"(choice) VALUES (?);";		
 			PreparedStatement insertingStatement = connection.prepareStatement(inserting);
@@ -106,7 +108,7 @@ public class ChoiceDAO {
 		// update choice
 		else
 		{
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
+			Connection connection = DriverManager.getConnection(database, username, password);
 
 			String toBeUpdatedTopic = "UPDATE public.\"Choices\" SET choice = ? where id ="+oldId+";";
 			PreparedStatement prepareTopicStatement = connection.prepareStatement(toBeUpdatedTopic);
@@ -134,7 +136,7 @@ public class ChoiceDAO {
 		// delete choice
 		else
 		{
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
+			Connection connection = DriverManager.getConnection(database, username, password);
 
 			String toBeUpdatedTopic = "DELETE FROM public.\"Choices\" WHERE id = "+id+";";
 			PreparedStatement prepareTopicStatement = connection.prepareStatement(toBeUpdatedTopic);
@@ -165,7 +167,7 @@ public class ChoiceDAO {
 		
 
 
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		
 		// Searching in choices if the choice already exists
 	
