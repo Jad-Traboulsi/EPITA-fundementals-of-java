@@ -9,9 +9,11 @@ import java.util.ArrayList;
 import fr.epita.classes.Quiz;
 
 public class QuizDAO {
+	String database = "jdbc:postgresql://localhost:5432/fundementals-of-java";
+	String username = "postgres";
+	String password = "";
 	public int getQuizId(Quiz quiz) throws Exception{
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-				"postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		String str = "SELECT id FROM public.\"Quizes\" where title = ?;";
 	
 		PreparedStatement preparedStatement = connection.prepareStatement(str);
@@ -28,8 +30,7 @@ public class QuizDAO {
 		return id;
 	}
 	public String getTitleById(int id) throws Exception{
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-				"postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		String str = "SELECT title FROM public.\"Quizes\" where id = ?;";
 	
 		PreparedStatement preparedStatement = connection.prepareStatement(str);
@@ -50,8 +51,7 @@ public class QuizDAO {
 	
 	public ArrayList<Quiz> getAllQuizes() throws Exception{
 		ArrayList<Quiz> out = new ArrayList<>();
-		Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-				"postgres", "");
+		Connection connection = DriverManager.getConnection(database, username, password);
 		String str = "SELECT * FROM public.\"Quizes\";";
 	
 		PreparedStatement preparedStatement = connection.prepareStatement(str);
@@ -79,7 +79,7 @@ public class QuizDAO {
 		}
 		else {
 			
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
+			Connection connection = DriverManager.getConnection(database, username, password);
 			
 			String inserting = "INSERT INTO public.\"Quizes\"(title)VALUES (?);";		
 			PreparedStatement insertingStatement = connection.prepareStatement(inserting);
@@ -99,8 +99,7 @@ public class QuizDAO {
 		}
 		// delete Quiz
 		else {
-			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
-					"postgres", "");
+			Connection connection = DriverManager.getConnection(database, username, password);
 
 			String str = "DELETE FROM public.\"Quizes\" WHERE id = " + id + ";";
 			PreparedStatement preparedStatement = connection.prepareStatement(str);
@@ -121,8 +120,7 @@ public class QuizDAO {
 			System.out.println("Quiz already exists");
 		}
 		else {
-			Connection connection = DriverManager
-					.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java", "postgres", "");
+			Connection connection = DriverManager.getConnection(database, username, password);
 			String str = "UPDATE public.\"Quizes\" set title = ? where id =?";
 			PreparedStatement insertingStatement = connection.prepareStatement(str);
 			insertingStatement.setString(1, newQuiz.getTitle());
