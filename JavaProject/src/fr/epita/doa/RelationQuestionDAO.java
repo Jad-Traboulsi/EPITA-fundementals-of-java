@@ -14,9 +14,9 @@ import fr.epita.classes.Topic;
 
 public class RelationQuestionDAO {
 
-	// for creating
-
-	public void createFullQuestion(FullQuestion full) throws Exception {
+	// check if answer in choices
+	
+	public boolean answerInChoices(FullQuestion full) throws Exception{
 		boolean exists = false;
 		for (Choice i: full.getChoices()){
 			if(i.getChoice().equals(full.getQuestion().getAnswer())) {
@@ -25,7 +25,13 @@ public class RelationQuestionDAO {
 				
 			}
 		}
-		if(exists) {
+		return exists;
+	}
+	
+	// for creating
+	
+	public void createFullQuestion(FullQuestion full) throws Exception {
+		if(answerInChoices(full)) {
 			Question question = full.getQuestion();
 			QuestionsDOA qdoa = new QuestionsDOA();
 			TopicDAO tdao = new TopicDAO();
@@ -146,7 +152,7 @@ public class RelationQuestionDAO {
 					"postgres", "");
 			String deleting = "delete from public.\"Relation_Questions_Topics\" where id_topic = ? ;";
 			PreparedStatement deletingStatement = connection.prepareStatement(deleting);
-			deletingStatement.setInt(2, topicId);
+			deletingStatement.setInt(1, topicId);
 			deletingStatement.execute();
 
 			connection.close();
@@ -182,6 +188,70 @@ public class RelationQuestionDAO {
 
 	}
 
+	public void unRelateTopicFromQuestion(Topic topic,Question question) throws Exception {
+
+		TopicDAO tdoa = new TopicDAO();
+		QuestionsDOA qdao = new QuestionsDOA();
+		int topicId = tdoa.getID(topic.getTopic());
+		int questionId = qdao.getID(question.getQuestion());
+		ArrayList<Integer> questionIds = getRelationTopicQuestion(topicId);
+		if (topicId == 0) {
+			throw new Exception("Topic not found");
+		} else if (questionId == 0) {
+			System.out.println("Question not found");
+		}else if (!questionIds.contains(questionId)) {
+			System.out.println("Topic not linked to question");
+		} else {
+
+			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
+					"postgres", "");
+			String deleting = "delete from public.\"Relation_Questions_Topics\" where id_topic = ? and id_question = ?;";
+			PreparedStatement deletingStatement = connection.prepareStatement(deleting);
+			deletingStatement.setInt(1, topicId);
+			deletingStatement.setInt(2, questionId);
+			deletingStatement.execute();
+
+			connection.close();
+			System.out.println("Topic Relation Deleted");
+			
+			
+		}
+
+	}
+
+	public void unRelateChoiceFromQuestion(Choice choice,Question question) throws Exception {
+
+		ChoiceDAO cdoa = new ChoiceDAO();
+
+		QuestionsDOA qdao = new QuestionsDOA();
+		int choiceId = cdoa.getID(choice.getChoice());
+
+		int questionId = qdao.getID(question.getQuestion());
+		ArrayList<Integer> questionIds = getRelationChoiceQuestion(choiceId);
+		if (choiceId == 0) {
+			throw new Exception("Choice not found");
+		} else if (questionId == 0) {
+			System.out.println("Question not found");
+		}else if (!questionIds.contains(questionId)) {
+			System.out.println("Choice not linked to question");
+		} else {
+
+			Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/fundementals-of-java",
+					"postgres", "");
+			String deleting = "delete from public.\"Relation_Questions_Choices\" where id_choice = ? and id_question = ? ;";
+			PreparedStatement deletingStatement = connection.prepareStatement(deleting);
+
+			deletingStatement.setInt(1, choiceId);
+			deletingStatement.setInt(2, questionId);
+			deletingStatement.execute();
+
+			connection.close();
+			System.out.println("Choice Relation Deleted");
+		}
+
+	}
+
+	
 	// for adding relation
 	
 	public void relateTopicToQuestion(Question question, Topic topic) throws Exception {
@@ -198,9 +268,8 @@ public class RelationQuestionDAO {
 		if (questionId == 0) {
 			throw new Exception("Question not found in database");
 		} else if (topicId == 0) {
-
-				throw new Exception(topic.getTopic() + " is not found in the database");
-			
+			tdao.createTopic(topic);
+			topicId = tdao.getID(topic.getTopic());
 		} else {
 			for (Topic i : topics) {
 				int topicIdInArray = tdao.getID(i.getTopic());
@@ -244,7 +313,8 @@ public class RelationQuestionDAO {
 		if (questionId == 0) {
 			throw new Exception("Question not found in database");
 		} else if (choiceId == 0) {
-			throw new Exception(choice.getChoice() + " is not found in the database");
+			cdao.createChoice(choice);
+			choiceId = cdao.getID(choice.getChoice());
 		} else if(choiceAnswerIdFound == 0) {
 			
 				throw new Exception(question.getAnswer()+" Answer not found in database");				
