@@ -1,5 +1,6 @@
 package fr.epita.doa;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -8,74 +9,139 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import fr.epita.classes.Choice;
+import fr.epita.services.filereader.Reader;
 
 
-public class ChoiceDAO {
-	String database = "jdbc:postgresql://localhost:5432/fundementals-of-java";
-	String username = "postgres";
-	String password = "";
-	public int getID(String choice) throws SQLException{
-
-
-		Connection connection = DriverManager.getConnection(database, username, password);
-		
-		// Searching in choices if the choice already exists
-	
-		String query = "SELECT id FROM public.\"Choices\" where  lower(choice) = lower(?); ";
-		PreparedStatement prepareStatement = connection.prepareStatement(query);	
-		prepareStatement.setString(1,choice);
-		ResultSet rs = prepareStatement.executeQuery();
+public class ChoiceDAO{
+	Reader r = new Reader();
+	String database = r.getDatabase();
+	String username = r.getUsername();
+	String password = r.getPassword();
+	public int getID(String choice){
 		int id = 0;
-		while (rs.next())
-		{
-			id = rs.getInt("id");
-		}
+		PreparedStatement prepareStatement = null;
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(database, username, password);
+		
+			// Searching in choices if the choice already exists
+		
+			String query = "SELECT id FROM public.\"Choices\" where  lower(choice) = lower(?); ";
+			prepareStatement = connection.prepareStatement(query);	
+			prepareStatement.setString(1,choice);
+			ResultSet rs = prepareStatement.executeQuery();
 			
-		connection.close();
+			while (rs.next())
+			{
+				id = rs.getInt("id");
+			}
+				
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}finally {
+			if(prepareStatement!=null) {
+				try {
+					prepareStatement.close();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if(connection!=null) {
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
 
 		return id;
 	}
-	public String getChoice(int id) throws SQLException{
+	public String getChoice(int id){
 
-
-		Connection connection = DriverManager.getConnection(database, username, password);
-		
-		// Searching in choices if the choice already exists
-		
-		String query = "SELECT choice FROM public.\"Choices\" where  id = ?; ";
-		PreparedStatement prepareStatement = connection.prepareStatement(query);	
-		prepareStatement.setInt(1,id);
-		ResultSet rs = prepareStatement.executeQuery();
 		String choice2 = "";
-		while (rs.next())
-		{
-			choice2 = rs.getString("choice");
-		}
+		PreparedStatement prepareStatement = null;
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(database, username, password);
 			
-		connection.close();
+			// Searching in choices if the choice already exists
+			
+			String query = "SELECT choice FROM public.\"Choices\" where  id = ?; ";
+			prepareStatement = connection.prepareStatement(query);	
+			prepareStatement.setInt(1,id);
+			ResultSet rs = prepareStatement.executeQuery();
+			while (rs.next())
+			{
+				choice2 = rs.getString("choice");
+			}
+				
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			if(prepareStatement!=null) {
+				try {
+					prepareStatement.close();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if(connection!=null) {
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
 
 		return choice2;
 	}
 	
-	public void createChoice(Choice choice) throws Exception{
+	public void createChoice(Choice choice) throws IOException{
 
-		int id = getID(choice.getChoice());
+		int id = getID(choice.getChoiceString());
 		// if not create choice
 		// get choice id add to list
 		if(id==0)
 		{
-
-			Connection connection = DriverManager.getConnection(database, username, password);
+			Connection connection = null;
+			PreparedStatement insertingStatement = null;
+			try {
+				connection = DriverManager.getConnection(database, username, password);
 			
-			String inserting = "INSERT INTO public.\"Choices\"(choice) VALUES (?);";		
-			PreparedStatement insertingStatement = connection.prepareStatement(inserting);
-			insertingStatement.setString(1,choice.getChoice());
-			insertingStatement.execute();
-			System.out.println("Choice Created");
-			connection.close();
+				String inserting = "INSERT INTO public.\"Choices\"(choice) VALUES (?);";		
+				insertingStatement = connection.prepareStatement(inserting);
+				insertingStatement.setString(1,choice.getChoiceString());
+				insertingStatement.execute();
+				System.out.println("Choice Created");
+				
+			} catch (Exception e) {
+
+				e.printStackTrace();
+			}finally {
+				if(insertingStatement!=null) {
+					try {
+						insertingStatement.close();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
+				if(connection!=null) {
+					try {
+						connection.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			
 		}
-		else if(choice.getChoice() == "") {
-			throw new Exception("Choice cannot be empty");
+		else if(choice.getChoiceString().equals("")) {
+			throw new IOException("Choice cannot be empty");
 		}
 		else
 		{
@@ -85,11 +151,11 @@ public class ChoiceDAO {
 	
 		
 	}	
-	public void updateChoice(Choice oldChoice,Choice newChoice) throws SQLException
+	public void updateChoice(Choice oldChoice,Choice newChoice)
 	{
 
-		int oldId = getID(oldChoice.getChoice());
-		int newId = getID(newChoice.getChoice());
+		int oldId = getID(oldChoice.getChoiceString());
+		int newId = getID(newChoice.getChoiceString());
 		// no id found
 		if (oldId==0)
 		{
@@ -101,56 +167,101 @@ public class ChoiceDAO {
 			System.out.println("New Choice already Exists");
 		}
 		// check if choice update needed 
-		else if(getChoice(getID(oldChoice.getChoice())).toLowerCase().equals(newChoice.getChoice().toLowerCase())|| newChoice.getChoice().equals(""))
+		else if(getChoice(getID(oldChoice.getChoiceString())).equalsIgnoreCase(newChoice.getChoiceString().toLowerCase())|| newChoice.getChoiceString().equals(""))
 		{
 			System.out.println("No Choices Changed");
 		}
 		// update choice
 		else
 		{
-			Connection connection = DriverManager.getConnection(database, username, password);
+			Connection connection = null;
+			PreparedStatement prepareTopicStatement= null;
+			
+			try {
+				connection = DriverManager.getConnection(database, username, password);
 
-			String toBeUpdatedTopic = "UPDATE public.\"Choices\" SET choice = ? where id ="+oldId+";";
-			PreparedStatement prepareTopicStatement = connection.prepareStatement(toBeUpdatedTopic);
-
-			prepareTopicStatement.setString(1,newChoice.getChoice());
-			prepareTopicStatement.executeUpdate();
-			System.out.println("Choice Updated");
-
-			connection.close();
+				String toBeUpdatedTopic = "UPDATE public.\"Choices\" SET choice = ? where id ="+oldId+";";
+				prepareTopicStatement = connection.prepareStatement(toBeUpdatedTopic);
+	
+				prepareTopicStatement.setString(1,newChoice.getChoiceString());
+				prepareTopicStatement.executeUpdate();
+				System.out.println("Choice Updated");
+	
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}finally {
+				if(prepareTopicStatement!=null) {
+					try {
+						prepareTopicStatement.close();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
+				if(connection!=null) {
+					try {
+						connection.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			
 		}
 	
 	
 
 	
 	}
-	public void deleteChoice(Choice choice) throws Exception{
+	public void deleteChoice(Choice choice) throws IOException{
 
 		
-		int id = getID(choice.getChoice());
+		int id = getID(choice.getChoiceString());
 		// no id found
 		if (id==0)
 		{
-			throw new Exception("Choice not found");
+			throw new IOException("Choice not found");
 		}
 		// delete choice
 		else
-		{
-			Connection connection = DriverManager.getConnection(database, username, password);
+		{	
+			Connection connection = null;
+			PreparedStatement query = null;
+			try {
+				connection = DriverManager.getConnection(database, username, password);
 
-			String toBeUpdatedTopic = "DELETE FROM public.\"Choices\" WHERE id = "+id+";";
-			PreparedStatement prepareTopicStatement = connection.prepareStatement(toBeUpdatedTopic);
-			prepareTopicStatement.executeUpdate();
-			connection.close();
-			System.out.println("Choice Deleted");
+				String str = "DELETE FROM public.\"Choices\" WHERE id = "+id+";";
+				query = connection.prepareStatement(str);
+				query.executeUpdate();
+				System.out.println("Choice Deleted");
+			} catch (Exception e) {
+
+				e.printStackTrace();
+			}finally {
+				if(query!=null) {
+					try {
+						query.close();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
+				if(connection!=null) {
+					try {
+						connection.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			
 		}
 	
 	}
-	public Choice searchChoice(Choice choice) throws SQLException{
+	public Choice searchChoice(Choice choice){
 		Choice out = new Choice();
-		int id = getID(choice.getChoice());
+		int id = getID(choice.getChoiceString());
 		out.setId(id);
-		out.setChoice(getChoice(choice.getId()));
+		out.setChoiceString(getChoice(choice.getId()));
 		if(id == 0)
 		{
 			System.out.println("Choice not found");
@@ -158,33 +269,51 @@ public class ChoiceDAO {
 		else
 		{
 			out.setId(id);
-			out.setChoice(getChoice(id));
+			out.setChoiceString(getChoice(id));
 		}
 		return out;
 	}
-	public ArrayList<Choice> getAllChoices() throws SQLException{
+	public ArrayList<Choice> getAllChoices(){
 		ArrayList<Choice> out = new ArrayList<>();
-		
-
-
-		Connection connection = DriverManager.getConnection(database, username, password);
-		
-		// Searching in choices if the choice already exists
-	
-		String query = "SELECT * FROM public.\"Choices\" ";
-		PreparedStatement prepareStatement = connection.prepareStatement(query);	
-		ResultSet rs = prepareStatement.executeQuery();
-		int id = 0;
-		String choice = "";
-		
-		while (rs.next())
-		{
-			id = rs.getInt("id");
-			choice = rs.getString("choice");
-			out.add(new Choice(choice,id));
-		}
+		Connection connection = null;
+		PreparedStatement prepareStatement = null;
+		try {
+			connection = DriverManager.getConnection(database, username, password);
 			
-		connection.close();
+			// Searching in choices if the choice already exists
+		
+			String query = "SELECT * FROM public.\"Choices\" ";
+			prepareStatement = connection.prepareStatement(query);	
+			ResultSet rs = prepareStatement.executeQuery();
+			int id = 0;
+			String choice = "";
+			
+			while (rs.next())
+			{
+				id = rs.getInt("id");
+				choice = rs.getString("choice");
+				out.add(new Choice(choice,id));
+			}
+				
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			if(prepareStatement!=null) {
+				try {
+					prepareStatement.close();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if(connection!=null) {
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
 
 		
 		return out;
