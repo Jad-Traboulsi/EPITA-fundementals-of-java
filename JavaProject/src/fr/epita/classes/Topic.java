@@ -1,7 +1,7 @@
 package fr.epita.classes;
 
 public class Topic {
-	private String topic;	
+	private String topicString;	
 	private int id;
 	
 	public Topic() {
@@ -10,23 +10,23 @@ public class Topic {
 	
 	public Topic(String topic) {
 		super();
-		this.topic = topic;
+		this.topicString = topic;
 	}
 	public Topic(String topic,int id) {
 		super();
-		this.topic = topic;
+		this.topicString = topic;
 		this.id = id;
 	}
 
 	
 
-	public String getTopic() {
-		return topic;
+	public String getTopicString() {
+		return topicString;
 	}
 
 
-	public void setTopic(String topic) {
-		this.topic = topic;
+	public void setTopicString(String topic) {
+		this.topicString = topic;
 	}
 
 
@@ -52,10 +52,10 @@ public class Topic {
 		Topic other = (Topic) obj;
 		if (id != other.id)
 			return false;
-		if (topic == null) {
-			if (other.topic != null)
+		if (topicString == null) {
+			if (other.topicString != null)
 				return false;
-		} else if (!topic.equals(other.topic))
+		} else if (!topicString.equals(other.topicString))
 			return false;
 		return true;
 	}
@@ -63,7 +63,7 @@ public class Topic {
 
 	@Override
 	public String toString() {
-		return "Topic [topic=" + topic + ", id=" + id + "]";
+		return "Topic [topicString=" + topicString + ", id=" + id + "]";
 	}
 	
 	
