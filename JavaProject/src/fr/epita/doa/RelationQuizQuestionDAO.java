@@ -2,10 +2,12 @@ package fr.epita.doa;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -14,13 +16,15 @@ import fr.epita.classes.FullQuestion;
 import fr.epita.classes.FullQuiz;
 import fr.epita.classes.Quiz;
 import fr.epita.classes.Topic;
+import fr.epita.services.filereader.Reader;
 
 public class RelationQuizQuestionDAO {
-	String database = "jdbc:postgresql://localhost:5432/fundementals-of-java";
-	String username = "postgres";
-	String password = "";
-	
-	public void createFullQuiz(FullQuiz fullQuiz) throws Exception {
+	Reader r = new Reader();
+	String database = r.getDatabase();
+	String username = r.getUsername();
+	String password = r.getPassword();
+	private Random rand= new Random();
+	public void createFullQuiz(FullQuiz fullQuiz) throws IOException{
 		RelationQuestionDAO rltnqdao = new RelationQuestionDAO();
 		QuizDAO qdao = new QuizDAO();
 		
@@ -34,10 +38,10 @@ public class RelationQuizQuestionDAO {
 		
 		
 	}
-	public FullQuiz getQuizFromTopic(String title,Topic topic,int numberOfQuestions) throws Exception {
+	public FullQuiz getQuizFromTopic(String title,Topic topic,int numberOfQuestions) throws IOException {
 		TopicDAO tdao = new TopicDAO();
-		if(tdao.getID(topic.getTopic()) == 0) {
-			throw new Exception("Topic not found in database");
+		if(tdao.getID(topic.getTopicString()) == 0) {
+			throw new IOException("Topic not found in database");
 		}
 		FullQuiz out = new FullQuiz();
 		QuizDAO quizdao = new QuizDAO();
@@ -49,7 +53,6 @@ public class RelationQuizQuestionDAO {
 			out.setFullQuestion(rltnquestiondao.getAllRelatedToTopic(topic));
 		}
 		else {
-			Random rand= new Random();
 			ArrayList<Integer> picked = new ArrayList<>();
 			int chooser = 0;
 			for(int i=0;i<numberOfQuestions;i++) {
@@ -71,21 +74,21 @@ public class RelationQuizQuestionDAO {
 		
 		return out;
 	}
-	public void relateQuestionToQuiz(FullQuestion fullQuestion, Quiz quiz) throws Exception {
+	public void relateQuestionToQuiz(FullQuestion fullQuestion, Quiz quiz) throws IOException {
 
 		QuestionsDOA questiondao = new QuestionsDOA();
 		QuizDAO quizdao = new QuizDAO();
 		boolean exists = false;
 		
 		//get question id
-		int questionId = questiondao.getID(fullQuestion.getQuestion().getQuestion());
+		int questionId = questiondao.getID(fullQuestion.getQuestion().getQuestionString());
 		//get quiz id
 		int quizId = quizdao.getQuizId(quiz);
 		if(questionId == 0) {
-			throw new Exception("Question "+fullQuestion.getQuestion().getQuestion() + " not found in database");
+			throw new IOException("Question "+fullQuestion.getQuestion().getQuestionString() + " not found in database");
 		}
 		else if(quizId == 0) {
-			throw new Exception("Quiz "+quiz.getTitle() + " not found in database");
+			throw new IOException("Quiz "+quiz.getTitle() + " not found in database");
 		}
 		else {
 			for(FullQuestion i : getAllRelatedToQuiz(quiz)) {
@@ -98,33 +101,53 @@ public class RelationQuizQuestionDAO {
 			}
 		}
 		if(!exists){
-		
-			Connection connection = DriverManager.getConnection(database, username, password);
-	
-			String inserting = "INSERT INTO public.\"Relation_Quizes_Questions\"(id_question,id_quiz) VALUES (?,?);";
-			PreparedStatement insertingStatement = connection.prepareStatement(inserting);
-			insertingStatement.setInt(1, questionId);
-			insertingStatement.setInt(2, quizId);
-			insertingStatement.execute();
-			connection.close();
+			PreparedStatement insertingStatement = null;
+			Connection connection = null;
+			try {
+				connection = DriverManager.getConnection(database, username, password);
+				
+				String inserting = "INSERT INTO public.\"Relation_Quizes_Questions\"(id_question,id_quiz) VALUES (?,?);";
+				insertingStatement = connection.prepareStatement(inserting);
+				insertingStatement.setInt(1, questionId);
+				insertingStatement.setInt(2, quizId);
+				insertingStatement.execute();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}finally {
+				if(insertingStatement!=null) {
+					try {
+						insertingStatement.close();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
+				if(connection!=null) {
+					try {
+						connection.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			
 		}
 
 	}
-	public void unrelateQuestionFromQuiz(FullQuestion fullQuestion, Quiz quiz) throws Exception{
+	public void unrelateQuestionFromQuiz(FullQuestion fullQuestion, Quiz quiz) throws IOException{
 
 		QuestionsDOA questiondao = new QuestionsDOA();
 		QuizDAO quizdao = new QuizDAO();
 		boolean exists = false;
 		
 		//get question id
-		int questionId = questiondao.getID(fullQuestion.getQuestion().getQuestion());
+		int questionId = questiondao.getID(fullQuestion.getQuestion().getQuestionString());
 		//get quiz id
 		int quizId = quizdao.getQuizId(quiz);
 		if(questionId == 0) {
-			throw new Exception("Question "+fullQuestion.getQuestion().getQuestion() + " not found in database");
+			throw new IOException("Question "+fullQuestion.getQuestion().getQuestionString() + " not found in database");
 		}
 		else if(quizId == 0) {
-			throw new Exception("Quiz "+quiz.getTitle() + " not found in database");
+			throw new IOException("Quiz "+quiz.getTitle() + " not found in database");
 		}
 		else {
 			int count = 0;
@@ -141,148 +164,245 @@ public class RelationQuizQuestionDAO {
 			}
 		}
 		if(exists){
+			PreparedStatement insertingStatement = null;
+			Connection connection = null;
+			try {
+
+				connection = DriverManager.getConnection(database, username, password);
 		
-			Connection connection = DriverManager.getConnection(database, username, password);
-	
-			String inserting = "delete from public.\"Relation_Quizes_Questions\" where id = ?;";
-			PreparedStatement insertingStatement = connection.prepareStatement(inserting);
-			insertingStatement.setInt(1, quizId);
-			insertingStatement.execute();
-			connection.close();
+				String inserting = "delete from public.\"Relation_Quizes_Questions\" where id = ?;";
+				insertingStatement = connection.prepareStatement(inserting);
+				insertingStatement.setInt(1, quizId);
+				insertingStatement.execute();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}finally {
+				if(insertingStatement!=null) {
+					try {
+						insertingStatement.close();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
+				if(connection!=null) {
+					try {
+						connection.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 	}
 	
 	// get all related to quiz
-	public ArrayList<FullQuestion> getAllRelatedToQuiz(Quiz quiz)throws Exception{
+	public ArrayList<FullQuestion> getAllRelatedToQuiz(Quiz quiz){
 		ArrayList<FullQuestion> out = new ArrayList<>();
-		
-		Connection connection = DriverManager.getConnection(database, username, password);
-		String str = "SELECT id_question FROM public.\"Relation_Quizes_Questions\" where id_quiz = ?;";
+		PreparedStatement preparedStatement = null;
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(database, username, password);
+			String str = "SELECT id_question FROM public.\"Relation_Quizes_Questions\" where id_quiz = ?;";
 
-		RelationQuestionDAO rltnQuestion = new RelationQuestionDAO();
-		QuestionsDOA qdoa = new QuestionsDOA();
-		QuizDAO quizdao = new QuizDAO();
-		PreparedStatement preparedStatement = connection.prepareStatement(str);
-		preparedStatement.setInt(1, quizdao.getQuizId(quiz));
+			RelationQuestionDAO rltnQuestion = new RelationQuestionDAO();
+			QuestionsDOA qdoa = new QuestionsDOA();
+			QuizDAO quizdao = new QuizDAO();
+			preparedStatement = connection.prepareStatement(str);
+			preparedStatement.setInt(1, quizdao.getQuizId(quiz));
 
-		ResultSet rs = preparedStatement.executeQuery();
-		int questionId = 0;
-		
-		while (rs.next()) {
-			questionId = rs.getInt("id_question");
-			out.add(rltnQuestion.getAllRelatedToQuestion(qdoa.getQuestion(questionId)));
+			ResultSet rs = preparedStatement.executeQuery();
+			int questionId = 0;
+			
+			while (rs.next()) {
+				questionId = rs.getInt("id_question");
+				out.add(rltnQuestion.getAllRelatedToQuestion(qdoa.getQuestion(questionId)));
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			if(preparedStatement!=null) {
+				try {
+					preparedStatement.close();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if(connection!=null) {
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		return out;
 	}
-	public ArrayList<FullQuiz> getAllQuizes() throws Exception{
+	public ArrayList<FullQuiz> getAllQuizes(){
 		ArrayList<FullQuiz> out = new ArrayList<>();
 		
 		QuizDAO quizdao = new QuizDAO();
+		PreparedStatement preparedStatement = null;
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(database, username, password);
+			String str = "SELECT * FROM public.\"Relation_Quizes_Questions\";";
 		
-		Connection connection = DriverManager.getConnection(database, username, password);
-		String str = "SELECT * FROM public.\"Relation_Quizes_Questions\";";
-	
-		PreparedStatement preparedStatement = connection.prepareStatement(str);
+			preparedStatement = connection.prepareStatement(str);
 
-		
-		ResultSet rs = preparedStatement.executeQuery();
-		int quizId = 0;
-		int temp = 0;
-		while (rs.next()) {
-			temp = quizId;
-			quizId = rs.getInt("id_quiz");
-			if(temp != quizId) {
-				String quizTitle = quizdao.getTitleById(quizId);
-				Quiz q = new Quiz(quizId,quizTitle);
-				out.add(new FullQuiz(q,getAllRelatedToQuiz(q)));
+			
+			ResultSet rs = preparedStatement.executeQuery();
+			int quizId = 0;
+			int temp = 0;
+			while (rs.next()) {
+				temp = quizId;
+				quizId = rs.getInt("id_quiz");
+				if(temp != quizId) {
+					String quizTitle = quizdao.getTitleById(quizId);
+					Quiz q = new Quiz(quizId,quizTitle);
+					out.add(new FullQuiz(q,getAllRelatedToQuiz(q)));
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			if(preparedStatement!=null) {
+				try {
+					preparedStatement.close();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if(connection!=null) {
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		}
-
+		
 		return out;
 	}
-	public FullQuiz getQuiz(Quiz quiz) throws Exception{
+	public FullQuiz getQuiz(Quiz quiz) throws IOException{
 		FullQuiz out = new FullQuiz();
 		QuizDAO quizdao = new QuizDAO();
 		//get quiz id
 		int quizId = quizdao.getQuizId(quiz);
 		if(quizId == 0) {
-			throw new Exception("Quiz "+quiz.getTitle() + " not found in database");
+			throw new IOException("Quiz "+quiz.getTitle() + " not found in database");
 		}
 		else {
-			Connection connection = DriverManager.getConnection(database, username, password);
-			String str = "SELECT id_question FROM public.\"Relation_Quizes_Questions\" where id_quiz = ?;";
-			
-			PreparedStatement preparedStatement = connection.prepareStatement(str);
-			preparedStatement.setInt(1, quizId);
-			
-			ResultSet rs = preparedStatement.executeQuery();
-			int questionId = 0;
-			ArrayList<FullQuestion> questionsFound = new ArrayList<>();
-			RelationQuestionDAO rltnQuestion = new RelationQuestionDAO();
-			QuestionsDOA qdoa = new QuestionsDOA();
-			while (rs.next()) {
-				questionId = rs.getInt("id_question");
-				questionsFound.add(rltnQuestion.getAllRelatedToQuestion(qdoa.getQuestion(questionId)));
-			}
+			PreparedStatement preparedStatement = null;
+			Connection connection = null;
+			try {
+				connection = DriverManager.getConnection(database, username, password);
+				String str = "SELECT id_question FROM public.\"Relation_Quizes_Questions\" where id_quiz = ?;";
+				
+				preparedStatement = connection.prepareStatement(str);
+				preparedStatement.setInt(1, quizId);
+				
+				ResultSet rs = preparedStatement.executeQuery();
+				int questionId = 0;
+				ArrayList<FullQuestion> questionsFound = new ArrayList<>();
+				RelationQuestionDAO rltnQuestion = new RelationQuestionDAO();
+				QuestionsDOA qdoa = new QuestionsDOA();
+				while (rs.next()) {
+					questionId = rs.getInt("id_question");
+					questionsFound.add(rltnQuestion.getAllRelatedToQuestion(qdoa.getQuestion(questionId)));
+				}
 
-			String quizTitle = quizdao.getTitleById(quizId);
-			Quiz q = new Quiz(quizId,quizTitle);
-			out = new FullQuiz(q,questionsFound);
-			connection.close();
+				String quizTitle = quizdao.getTitleById(quizId);
+				Quiz q = new Quiz(quizId,quizTitle);
+				out = new FullQuiz(q,questionsFound);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}finally {
+				if(preparedStatement!=null) {
+					try {
+						preparedStatement.close();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
+				if(connection!=null) {
+					try {
+						connection.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			
 		}
 		return out;
 	}
 	
 	// print on text
-	public void outOnText(FullQuiz fq) throws Exception{
+	public void outOnText(FullQuiz fq){
 		QuizDAO quizDAO = new QuizDAO();
 		File file = new File("./"+fq.getQuiz().getTitle()+".txt");
 		boolean fileExists = file.exists();
-		if(!fileExists)
-			file.createNewFile();
-
-		FileWriter fr = new FileWriter(file,false);
-		String lineSep = System.getProperty("line.separator");
-		fr.append("Name:________"+lineSep);
-		fr.append("ID:________"+lineSep);
-		fr.append(lineSep);
-		fr.append(fq.getQuiz().getTitle()+" Quiz");
-		fr.append(lineSep);
-		fr.append("Quiz ID: "+quizDAO.getQuizId(fq.getQuiz()));
-		fr.append(lineSep);
-		fr.append(lineSep);
-		fr.append(lineSep);
-		ArrayList<FullQuestion> allQuestions = fq.getFullQuestion();
-		for(int i = 0;i<allQuestions.size();i++) {
-			FullQuestion question= allQuestions.get(i);
-			fr.append(i+1+". "+question.getQuestion().getQuestion()+"\t("+question.getQuestion().getDifficulty()+" pt(s))");
-			fr.append(lineSep);
-			Random rand= new Random();
-			ArrayList<Integer> numbersChosen = new ArrayList<>();
-			Choice choices[] = question.getChoices();
-			int randNumber = 0;
-			for(int j=0;j<choices.length;j++) {
-
-				fr.append("\t");
-				randNumber = rand.nextInt(choices.length);
-				while(numbersChosen.contains(randNumber)) {
-					randNumber = rand.nextInt(choices.length);
+		if(!fileExists) {
+			try {
+				if(file.createNewFile()) {
+					System.out.println("File Created");
 				}
-				numbersChosen.add(randNumber);
-				fr.append(j+1+". "+choices[randNumber].getChoice());
-				fr.append(lineSep);
+				else {
+					System.out.println("Cannot create file");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-			fr.append(lineSep);
-			
 		}
+		try(FileWriter fr = new FileWriter(file,false)){
 			
 		
-		fr.close();
+			String lineSep = System.getProperty("line.separator");
+			fr.append("Name:________"+lineSep);
+			fr.append("ID:________"+lineSep);
+			fr.append(lineSep);
+			fr.append(fq.getQuiz().getTitle()+" Quiz");
+			fr.append(lineSep);
+			fr.append("Quiz ID: "+quizDAO.getQuizId(fq.getQuiz()));
+			fr.append(lineSep);
+			fr.append(lineSep);
+			fr.append(lineSep);
+			ArrayList<FullQuestion> allQuestions = fq.getFullQuestion();
+			
+			
+			for(int i = 0;i<allQuestions.size();i++) {
+				FullQuestion question= allQuestions.get(i);
+				fr.append(i+1+". "+question.getQuestion().getQuestionString()+"\t("+question.getQuestion().getDifficulty()+" pt(s))");
+				fr.append(lineSep);
+				ArrayList<Integer> numbersChosen = new ArrayList<>();
+				Choice[] choices = question.getChoices();
+				int randNumber = 0;
+				for(int j=0;j<choices.length;j++) {
+	
+					fr.append("\t");
+					randNumber = rand.nextInt(choices.length);
+					while(numbersChosen.contains(randNumber)) {
+						randNumber = rand.nextInt(choices.length);
+					}
+					numbersChosen.add(randNumber);
+					fr.append(j+1+". "+choices[randNumber].getChoiceString());
+					fr.append(lineSep);
+				}
+				fr.append(lineSep);
+				
+			}
+			fr.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	
 
 	}
-	public int totalGradeOfQuiz(FullQuiz fq) throws Exception{
+	public int totalGradeOfQuiz(FullQuiz fq){
 		int total = 0;
 		
 		for(FullQuestion i : fq.getFullQuestion()) {
