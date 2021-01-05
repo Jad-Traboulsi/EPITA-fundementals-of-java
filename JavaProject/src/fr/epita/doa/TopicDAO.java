@@ -1,5 +1,6 @@
 package fr.epita.doa;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -8,72 +9,133 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import fr.epita.classes.Topic;
+import fr.epita.services.filereader.Reader;
 
 
 public class TopicDAO {
-	String database = "jdbc:postgresql://localhost:5432/fundementals-of-java";
-	String username = "postgres";
-	String password = "";
+	Reader r = new Reader();
+	String database = r.getDatabase();
+	String username = r.getUsername();
+	String password = r.getPassword();
 	
-	public int getID(String topic) throws SQLException{
-
-
-		Connection connection = DriverManager.getConnection(database, username, password);
-		// Searching in topics if the topic already exists
-	
-		String query = "SELECT id FROM public.\"Topics\" where  lower(topic) = lower(?); ";
-		PreparedStatement prepareStatement = connection.prepareStatement(query);	
-		prepareStatement.setString(1,topic);
-		ResultSet rs = prepareStatement.executeQuery();
+	public int getID(String topic){
 		int id = 0;
-		while (rs.next())
-		{
-			id = rs.getInt("id");
-		}
+		PreparedStatement prepareStatement = null;
+		Connection connection = null;
+		try {
+
+			connection = DriverManager.getConnection(database, username, password);
+			// Searching in topics if the topic already exists
+		
+			String query = "SELECT id FROM public.\"Topics\" where  lower(topic) = lower(?); ";
+			prepareStatement = connection.prepareStatement(query);	
+			prepareStatement.setString(1,topic);
+			ResultSet rs = prepareStatement.executeQuery();
 			
-		connection.close();
+			while (rs.next())
+			{
+				id = rs.getInt("id");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			if(prepareStatement!=null) {
+				try {
+					prepareStatement.close();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if(connection!=null) {
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
 
 		return id;
 	}
-	public String getTopic(int id) throws SQLException{
+	public String getTopic(int id){
 
-
-		Connection connection = DriverManager.getConnection(database, username, password);
-		// Searching in topics if the topic already exists
-		
-		String query = "SELECT topic FROM public.\"Topics\" where  id = ?; ";
-		PreparedStatement prepareStatement = connection.prepareStatement(query);	
-		prepareStatement.setInt(1,id);
-		ResultSet rs = prepareStatement.executeQuery();
 		String topic2 = "";
-		while (rs.next())
-		{
-			topic2 = rs.getString("topic");
-		}
+		Connection connection = null;
+		PreparedStatement prepareStatement = null;
+		try {
+			connection = DriverManager.getConnection(database, username, password);
+			// Searching in topics if the topic already exists
 			
-		connection.close();
+			String query = "SELECT topic FROM public.\"Topics\" where  id = ?; ";
+			prepareStatement = connection.prepareStatement(query);	
+			prepareStatement.setInt(1,id);
+			ResultSet rs = prepareStatement.executeQuery();
+			while (rs.next())
+			{
+				topic2 = rs.getString("topic");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			if(prepareStatement!=null) {
+				try {
+					prepareStatement.close();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if(connection!=null) {
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
 
 		return topic2;
 	}
 	
-	public void createTopic(Topic topic) throws Exception{
+	public void createTopic(Topic topic) throws IOException{
 
-		int id = getID(topic.getTopic());
+		int id = getID(topic.getTopicString());
 		// if not create topic
 		// get topic id add to list
 		if(id==0)
 		{
-
-			Connection connection = DriverManager.getConnection(database, username, password);
-			String inserting = "INSERT INTO public.\"Topics\"(topic) VALUES (?);";		
-			PreparedStatement insertingStatement = connection.prepareStatement(inserting);
-			insertingStatement.setString(1,topic.getTopic());
-			insertingStatement.execute();
-			System.out.println("Topic Created");
-			connection.close();
+			PreparedStatement insertingStatement = null;
+			Connection connection = null;
+			try {
+				connection = DriverManager.getConnection(database, username, password);
+				String inserting = "INSERT INTO public.\"Topics\"(topic) VALUES (?);";		
+				insertingStatement = connection.prepareStatement(inserting);
+				insertingStatement.setString(1,topic.getTopicString());
+				insertingStatement.execute();
+				System.out.println("Topic Created");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}finally {
+				if(insertingStatement!=null) {
+					try {
+						insertingStatement.close();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
+				if(connection!=null) {
+					try {
+						connection.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			
 		}
-		else if(topic.getTopic() == "") {
-			throw new Exception("Topic cannot be empty");
+		else if(topic.getTopicString().equals("")) {
+			throw new IOException("Topic cannot be empty");
 		}
 		else
 		{
@@ -83,12 +145,12 @@ public class TopicDAO {
 	
 		
 	}	
-	public void updateTopic(Topic oldTopic,Topic newTopic) throws SQLException
+	public void updateTopic(Topic oldTopic,Topic newTopic)
 	{
 
 		
-		int newId = getID(newTopic.getTopic());
-		int id = getID(oldTopic.getTopic());
+		int newId = getID(newTopic.getTopicString());
+		int id = getID(oldTopic.getTopicString());
 		// no id found
 		if (id==0)
 		{
@@ -100,86 +162,146 @@ public class TopicDAO {
 			System.out.println("New Topic Already Exists");
 		}
 		// check if topic update needed 
-		else if(getTopic(getID(oldTopic.getTopic())).toLowerCase().equals(newTopic.getTopic().toLowerCase())|| newTopic.getTopic().equals(""))
+		else if(getTopic(getID(oldTopic.getTopicString())).equalsIgnoreCase(newTopic.getTopicString())|| newTopic.getTopicString().equals(""))
 		{
 			System.out.println("No Topics Changed");
 		}
 		// update topic
 		else
 		{
-			Connection connection = DriverManager.getConnection(database, username, password);
-			String toBeUpdatedTopic = "UPDATE public.\"Topics\" SET topic = ? where id ="+id+";";
-			PreparedStatement prepareTopicStatement = connection.prepareStatement(toBeUpdatedTopic);
+			PreparedStatement prepareTopicStatement = null;
+			Connection connection = null;
+			try {
+				connection = DriverManager.getConnection(database, username, password);
+				String toBeUpdatedTopic = "UPDATE public.\"Topics\" SET topic = ? where id ="+id+";";
+				prepareTopicStatement = connection.prepareStatement(toBeUpdatedTopic);
 
-			prepareTopicStatement.setString(1,newTopic.getTopic());
-			prepareTopicStatement.executeUpdate();
-			System.out.println("Topic Updated");
+				prepareTopicStatement.setString(1,newTopic.getTopicString());
+				prepareTopicStatement.executeUpdate();
+				System.out.println("Topic Updated");
 
-			connection.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}finally {
+				if(prepareTopicStatement!=null) {
+					try {
+						prepareTopicStatement.close();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
+				if(connection!=null) {
+					try {
+						connection.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			
 		}
 	
 	
 
 	
 	}
-	public void deleteTopic(Topic topic) throws Exception{
+	public void deleteTopic(Topic topic) throws IOException{
 
 		
-		int id = getID(topic.getTopic());
+		int id = getID(topic.getTopicString());
 		// no id found
 		if (id==0)
 		{
-			throw new Exception("Topic not found");
+			throw new IOException("Topic not found");
 		}
 		// delete topic
 		else
 		{
-			Connection connection = DriverManager.getConnection(database, username, password);
-			String toBeUpdatedTopic = "DELETE FROM public.\"Topics\" WHERE id = "+id+";";
-			PreparedStatement prepareTopicStatement = connection.prepareStatement(toBeUpdatedTopic);
-			prepareTopicStatement.executeUpdate();
-			System.out.println("Topic Deleted");
-
-			connection.close();
+			Connection connection = null;
+			PreparedStatement prepareTopicStatement = null;
+			try {
+				connection = DriverManager.getConnection(database, username, password);
+				String toBeUpdatedTopic = "DELETE FROM public.\"Topics\" WHERE id = "+id+";";
+				prepareTopicStatement = connection.prepareStatement(toBeUpdatedTopic);
+				prepareTopicStatement.executeUpdate();
+				System.out.println("Topic Deleted");
+	
+			} catch (Exception e) {
+				e.printStackTrace();
+			}finally {
+				if(prepareTopicStatement!=null) {
+					try {
+						prepareTopicStatement.close();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
+				if(connection!=null) {
+					try {
+						connection.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			
 		}
 	
 	}
-	public Topic searchTopic(Topic topic) throws Exception{
+	public Topic searchTopic(Topic topic) throws IOException{
 		Topic out = new Topic();
-		int id = getID(topic.getTopic());
+		int id = getID(topic.getTopicString());
 		if(id == 0)
 		{
-			throw new Exception("Topic not found");
+			throw new IOException("Topic not found");
 		}
 		else {
 
 			out.setId(id);
-			out.setTopic(getTopic(id));
+			out.setTopicString(getTopic(id));
 		}
 		return out;
 	}
-	public ArrayList<Topic> getAllTopics() throws SQLException{
+	public ArrayList<Topic> getAllTopics(){
 		ArrayList<Topic> out = new ArrayList<>();
 		
-
-
-		Connection connection = DriverManager.getConnection(database, username, password);
-		// Searching in topics if the topic already exists
-	
-		String query = "SELECT * FROM public.\"Topics\" ";
-		PreparedStatement prepareStatement = connection.prepareStatement(query);	
-		ResultSet rs = prepareStatement.executeQuery();
-		int id = 0;
-		String topic = "";
+		Connection connection = null;
+		PreparedStatement prepareStatement = null;
+		try {
+			connection = DriverManager.getConnection(database, username, password);
+			// Searching in topics if the topic already exists
 		
-		while (rs.next())
-		{
-			id = rs.getInt("id");
-			topic = rs.getString("topic");
-			out.add(new Topic(topic,id));
-		}
+			String query = "SELECT * FROM public.\"Topics\" ";
+			prepareStatement = connection.prepareStatement(query);	
+			ResultSet rs = prepareStatement.executeQuery();
+			int id = 0;
+			String topic = "";
 			
-		connection.close();
+			while (rs.next())
+			{
+				id = rs.getInt("id");
+				topic = rs.getString("topic");
+				out.add(new Topic(topic,id));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			if(prepareStatement!=null) {
+				try {
+					prepareStatement.close();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if(connection!=null) {
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
 
 		
 		return out;
