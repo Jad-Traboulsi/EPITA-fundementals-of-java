@@ -1,5 +1,6 @@
 package fr.epita.launcher;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -25,74 +26,17 @@ import fr.epita.doa.StudentDAO;
 import fr.epita.doa.StudentQuizDAO;
 import fr.epita.doa.TopicDAO;
 
+
 public class Launcher {
-	public static void main(String[] args) throws Exception {
-
-//		RelationQuestionDAO relquestiondao = new RelationQuestionDAO();
-//		RelationQuizQuestionDAO relqqdao = new RelationQuizQuestionDAO();
-//		StudentDAO sdao = new StudentDAO();
-//		StudentAnswersDAO sanswersdao =  new  StudentAnswersDAO();
-//		StudentQuizDAO squizdao =  new  StudentQuizDAO();
-
-//		Question question1 = new Question("What is this course's name?","Introduction to Java",1);
-//		Choice choices1[] =new Choice[3];
-//		choices1[0] = new Choice("Introduction to python");
-//		choices1[1] = new Choice("Introduction to Java");
-//		choices1[2] = new Choice("Introduction to C++");
-//		Topic topics1[] = new Topic[2];
-//		topics1[0] = new Topic("Introduction");
-//		topics1[1] = new Topic("Basic");
-//
-//		
-//		relquestiondao.createFullQuestion(new FullQuestion(question1,topics1,choices1));
-//		
-//		
-//		System.out.println("Done 1");
-//		Question question2 = new Question("What is your favorite programming language","Java",1);
-//		Choice choices2[] =new Choice[3];
-//		choices2[0] = new Choice("Python");
-//		choices2[1] = new Choice("Java");
-//		choices2[2] = new Choice("C++");
-//		Topic topics2[] = new Topic[2];
-//		topics2[0] = new Topic("Introduction");
-//		topics2[1] = new Topic("Preference");
-//		
-//		relquestiondao.createFullQuestion(new FullQuestion(question2,topics2,choices2));
-//		
-//		System.out.println("Done 2");
-//
-//		ArrayList<FullQuestion> fqByTopic = relquestiondao.getAllRelatedToTopic(new Topic("Introduction"));
-//		System.out.println(fqByTopic.size());
-//		for(FullQuestion i :fqByTopic) {
-//			System.out.println(i);
-//		}
-//		
-//
-//		FullQuiz out = relqqdao.getQuizFromTopic("Programming", new Topic("Introduction"),5);
-//		FullQuiz out2 = relqqdao.getQuizFromTopic("Programming 2", new Topic("Preference"),5);
-//		FullQuiz out3 = relqqdao.getQuizFromTopic("Programming 3", new Topic("Basic"),5);
-//		System.out.println(out);
-//		System.out.println(out2);
-//		System.out.println(out3);
-//		
-//		for(FullQuiz i :relqqdao.getAllQuizes()) {
-//			System.out.println(i);
-//		}
-//		FullQuiz fq = relqqdao.getQuiz(new Quiz("Programming"));
-//		relqqdao.outOnText(fq);
-//		Student s1 = new Student("Jad","Traboulsi", LocalDate.of(1996, 4, 16),"M");
-//		sdao.createStudent(s1);
-//		ArrayList<String> answers = new ArrayList<>();
-//		answers.add("Introduction to Java");
-//		answers.add("Java");
-//		sanswersdao.createAnswers(s1, fq, answers);
-//		System.out.println(squizdao.getGrade(s1, fq));
-//		System.out.println(squizdao.totalMax(s1, fq));
+	private static Random rand = new Random();
+	
+	public static void main(String[] args) throws IOException{
 		menuUsingConsole();
+		
 
 	}
 
-	public static void menuUsingConsole() throws Exception {
+	public static void menuUsingConsole() throws IOException {
 		int menu1 = 0;
 		Scanner input = new Scanner(System.in);
 		while (menu1 == 0) {
@@ -102,7 +46,7 @@ public class Launcher {
 			System.out.println("2- If you're a Student");
 			System.out.println("3- If you want to quit");
 			menu1 = Integer.parseInt(input.nextLine());
-			;
+			
 			while (menu1 != 1 && menu1 != 2 && menu1 != 3) {
 				System.out.println("Invalid input.");
 				System.out.println("What would you like to do?");
@@ -110,7 +54,7 @@ public class Launcher {
 				System.out.println("2- If you're a Student");
 				System.out.println("3- If you want to quit");
 				menu1 = Integer.parseInt(input.nextLine());
-				;
+				
 			}
 			// teacher
 			while (menu1 == 1) {
@@ -121,7 +65,7 @@ public class Launcher {
 				System.out.println("3- Access Quizes");
 				System.out.println("4- Exit");
 				menu2 = Integer.parseInt(input.nextLine());
-				;
+				
 				while (menu2 != 1 && menu2 != 2 && menu2 != 3 && menu2 != 4) {
 					System.out.println("Invalid input.");
 					System.out.println("What would you like to Access?");
@@ -130,7 +74,7 @@ public class Launcher {
 					System.out.println("3- Access Quizes");
 					System.out.println("4- Exit");
 					menu2 = Integer.parseInt(input.nextLine());
-					;
+					
 				}
 				// Questions
 				while (menu2 == 1) {
@@ -141,7 +85,7 @@ public class Launcher {
 					System.out.println("3- Add Full Question");
 					System.out.println("4- Exit");
 					menu3 = Integer.parseInt(input.nextLine());
-					;
+					
 					while (menu3 != 1 && menu3 != 2 && menu3 != 3 && menu3 != 4) {
 						System.out.println("Invalid input.");
 						System.out.println("What would you like to do Questions?");
@@ -150,7 +94,7 @@ public class Launcher {
 						System.out.println("3- Add Full Question");
 						System.out.println("4- Exit");
 						menu3 = Integer.parseInt(input.nextLine());
-						;
+						
 					}
 					if (menu3 == 1) {
 						RelationQuestionDAO rltndao = new RelationQuestionDAO();
@@ -169,9 +113,9 @@ public class Launcher {
 						System.out.println("Which question you want to modify?");
 						System.out.println("Enter question ID");
 						int id = Integer.parseInt(input.nextLine());
-						;
+						
 						Question quest = questiondao.getQuestion(id);
-						if (quest.getQuestion().equals("")) {
+						if (quest.getQuestionString().equals("")) {
 							System.out.println("Question not found");
 							menu3 = 0;
 						} else {
@@ -184,7 +128,7 @@ public class Launcher {
 								System.out.println("3- Choice");
 								System.out.println("4- Exit");
 								menu4 = Integer.parseInt(input.nextLine());
-								;
+								
 								while (menu4 != 1 && menu4 != 2 && menu4 != 3 && menu4 != 4) {
 									System.out.println("Invalid Input");
 									System.out.println("What do you want to modify?");
@@ -193,7 +137,7 @@ public class Launcher {
 									System.out.println("3- Choice");
 									System.out.println("4- Exit");
 									menu4 = Integer.parseInt(input.nextLine());
-									;
+									
 
 								}
 
@@ -206,7 +150,7 @@ public class Launcher {
 									System.out.println("3- Difficulty");
 									System.out.println("4- Exit");
 									menu5 = Integer.parseInt(input.nextLine());
-									;
+									
 									while (menu5 != 1 && menu5 != 2 && menu5 != 3 && menu5 != 4) {
 										System.out.println("Invalid Input");
 										System.out.println("What do you want to modify?");
@@ -221,7 +165,7 @@ public class Launcher {
 										System.out.println("Enter new Question");
 										String newQuest = input.nextLine();
 										questiondao.updateQuestion(quest, new Question(newQuest, "", -1));
-										quest.setQuestion(newQuest);
+										quest.setQuestionString(newQuest);
 										System.out.println("Done");
 									} else if (menu5 == 2) {
 										System.out.println("Enter new Answer");
@@ -259,7 +203,7 @@ public class Launcher {
 										System.out.println("Which topic you want to modify?");
 										System.out.println("Enter the topic ID");
 										int topicId = Integer.parseInt(input.nextLine());
-										;
+										
 										Topic[] topicsInFullQuestion = fullQuestion.getTopics();
 										ArrayList<Integer> topicIds = new ArrayList<>();
 										for (Topic i : topicsInFullQuestion) {
@@ -378,7 +322,7 @@ public class Launcher {
 
 						System.out.println("How many topics you want to put for this question?");
 						int topicSize = Integer.parseInt(input.nextLine());
-						Topic topics[] = new Topic[topicSize];
+						Topic[] topics = new Topic[topicSize];
 						for (int i = 0; i < topicSize; i++) {
 							System.out.println("Topic " + (i + 1));
 							String topicString = input.nextLine();
@@ -387,8 +331,8 @@ public class Launcher {
 
 						System.out.println("How many choices you want to put for this question?");
 						int choiceSize = Integer.parseInt(input.nextLine());
-						;
-						Choice choices[] = new Choice[choiceSize];
+						
+						Choice[] choices = new Choice[choiceSize];
 						for (int i = 0; i < choiceSize; i++) {
 							System.out.println("Choice " + (i + 1));
 							String choiceString = input.nextLine();
@@ -412,7 +356,7 @@ public class Launcher {
 					System.out.println("3- Update student");
 					System.out.println("4- Exit");
 					menu3 = Integer.parseInt(input.nextLine());
-					;
+					
 					while (menu3 != 1 && menu3 != 2 && menu3 != 3 && menu3 != 4) {
 						System.out.println("Invalid input.");
 
@@ -422,7 +366,7 @@ public class Launcher {
 						System.out.println("3- Update student");
 						System.out.println("4- Exit");
 						menu3 = Integer.parseInt(input.nextLine());
-						;
+						
 					}
 					if (menu3 == 1) {
 						StudentDAO sdao = new StudentDAO();
@@ -491,8 +435,8 @@ public class Launcher {
 								menu4 = Integer.parseInt(input.nextLine());
 
 								Student newStudent = new Student();
-								newStudent.setFirst_name(studentFound.getFirst_name());
-								newStudent.setLast_name(studentFound.getLast_name());
+								newStudent.setFirstName(studentFound.getFirstName());
+								newStudent.setLastName(studentFound.getLastName());
 								newStudent.setGender(studentFound.getGender());
 								newStudent.setDob(studentFound.getDob());
 
@@ -510,13 +454,13 @@ public class Launcher {
 								if (menu4 == 1) {
 									System.out.println("Enter first name");
 									String fname = input.nextLine();
-									newStudent.setFirst_name(fname);
+									newStudent.setFirstName(fname);
 									sdao.updateStudent(studentFound, newStudent);
 								}
 								if (menu4 == 2) {
 									System.out.println("Enter last name");
 									String lname = input.nextLine();
-									newStudent.setLast_name(lname);
+									newStudent.setLastName(lname);
 									sdao.updateStudent(studentFound, newStudent);
 								}
 								if (menu4 == 3) {
@@ -678,14 +622,14 @@ public class Launcher {
 							
 							System.out.println("How many Questions you want to create?");
 							int questionSize = Integer.parseInt(input.nextLine());
-							
-							for(int i = 0;i<questionSize;i++) {
+							int i = 0;
+							while(i<questionSize) {
 								boolean questionExists = false;
 								System.out.println("Enter Question "+(i+1));
 								String questionTitle = input.nextLine();
 								
 								for(int j=0;j<allQuestion.size();j++) {
-									if(allQuestion.get(j).getQuestion().getQuestion().equals(questionTitle)) {
+									if(allQuestion.get(j).getQuestion().getQuestionString().equals(questionTitle)) {
 										questionExists = true;
 										break;
 									}
@@ -698,7 +642,7 @@ public class Launcher {
 									questionTitle = input.nextLine();
 									
 									for(int j=0;j<allQuestion.size();j++) {
-										if(allQuestion.get(j).getQuestion().getQuestion().equals(questionTitle)) {
+										if(allQuestion.get(j).getQuestion().getQuestionString().equals(questionTitle)) {
 											questionExists = true;
 											break;
 										}
@@ -717,7 +661,7 @@ public class Launcher {
 								
 								System.out.println("How many topics do you want?");
 								int topicSize = Integer.parseInt(input.nextLine());
-								Topic topics[] = new Topic[topicSize];
+								Topic[] topics = new Topic[topicSize];
 								for(int j = 0;j<topicSize;j++) {
 									System.out.println("Enter topic:");
 									String topicTitle = input.nextLine();
@@ -726,7 +670,7 @@ public class Launcher {
 
 								System.out.println("How many choices do you want?");
 								int choiceSize = Integer.parseInt(input.nextLine());
-								Choice choices[] = new Choice[choiceSize];
+								Choice[] choices = new Choice[choiceSize];
 								for(int j = 0;j<choiceSize;j++) {
 									System.out.println("Enter topic:");
 									String choiceTitle = input.nextLine();
@@ -742,6 +686,7 @@ public class Launcher {
 								else {
 									allQuestion.add(fq);
 								}
+								i++;
 							}
 							
 							RelationQuizQuestionDAO rltqqdao = new RelationQuizQuestionDAO();
@@ -825,7 +770,7 @@ public class Launcher {
 								FullQuiz fq = rltqqdao.getQuiz(quizFound);
 								int totalQuizGrade = rltqqdao.totalGradeOfQuiz(fq);
 								if(sqdao.isPresent(studentFound, fq)) {
-									System.out.println(studentFound.getFirst_name()+": Quiz :"+quizFound.getId()+" Grade: "+sqdao.getGrade(studentFound, fq)+"/"+totalQuizGrade);
+									System.out.println(studentFound.getFirstName()+": Quiz :"+quizFound.getId()+" Grade: "+sqdao.getGrade(studentFound, fq)+"/"+totalQuizGrade);
 								}
 								else {
 									System.out.println("Quiz not related to Student");
@@ -855,7 +800,7 @@ public class Launcher {
 							while (keys.hasMoreElements()) {
 								Student key = keys.nextElement();
 								if (allStudentGrades.get(key) != -1) {
-									System.out.println(key.getFirst_name() + ": " + allStudentGrades.get(key) + " / "
+									System.out.println(key.getFirstName() + ": " + allStudentGrades.get(key) + " / "
 											+ totalQuizGrade);
 									count++;
 								}
@@ -924,7 +869,7 @@ public class Launcher {
 							while (keys.hasMoreElements()) {
 								Student key = keys.nextElement();
 								if (allStudentGrades.get(key) ==-1) {
-									System.out.println(count+": "+key.getFirst_name());
+									System.out.println(count+": "+key.getFirstName());
 									count++;
 								}
 							}
@@ -1018,7 +963,7 @@ public class Launcher {
 				student = sdao.getStudentByName(new Student(firstName, lastName, LocalDate.of(1996, 4, 16), "M"));
 
 			}
-			System.err.println("Hello " + student.getFirst_name());
+			System.err.println("Hello " + student.getFirstName());
 			while (menu2 != 5) {
 				System.out.println("What would you like to do?");
 				System.out.println("1- Answer quiz");
@@ -1027,7 +972,7 @@ public class Launcher {
 				System.out.println("4- Get unfinished quizes");
 				System.out.println("5- Exit");
 				menu2 = Integer.parseInt(input.nextLine());
-				;
+				
 
 				while (menu2 != 1 && menu2 != 2 && menu2 != 3 && menu2 != 4 && menu2 != 5) {
 					System.out.println("Invalid input.");
@@ -1038,14 +983,14 @@ public class Launcher {
 					System.out.println("4- Get unfinished quizes");
 					System.out.println("5- Exit");
 					menu2 = Integer.parseInt(input.nextLine());
-					;
+					
 				}
 				if (menu2 == 1) {
 
 					QuizDAO qdao = new QuizDAO();
 					System.out.println("Enter Quiz ID");
 					int quizId = Integer.parseInt(input.nextLine());
-					;
+					
 					quizId = qdao.getQuizId(new Quiz(qdao.getTitleById(quizId)));
 					if (quizId == 0) {
 						System.out.println("Quiz not found");
@@ -1061,11 +1006,12 @@ public class Launcher {
 							System.out.println("This quiz is not assigned to you.");
 						} else {
 							ArrayList<String> answers = new ArrayList<>();
+
+							
 							for (int i = 0; i < fullQuiz.getFullQuestion().size(); i++) {
 								System.out.println(
-										i + 1 + ". " + fullQuiz.getFullQuestion().get(i).getQuestion().getQuestion());
+										i + 1 + ". " + fullQuiz.getFullQuestion().get(i).getQuestion().getQuestionString());
 								int randNumber = 0;
-								Random rand = new Random();
 								ArrayList<Integer> numbersChosen = new ArrayList<>();
 								for (int j = 0; j < fullQuiz.getFullQuestion().get(i).getChoices().length; j++) {
 
@@ -1077,13 +1023,13 @@ public class Launcher {
 									}
 									numbersChosen.add(randNumber);
 									System.out.println(j + 1 + ". "
-											+ fullQuiz.getFullQuestion().get(i).getChoices()[randNumber].getChoice());
+											+ fullQuiz.getFullQuestion().get(i).getChoices()[randNumber].getChoiceString());
 								}
 								System.out.println("Your answer is:");
 								int picked = Integer.parseInt(input.nextLine());
-								;
+								
 								String answer = fullQuiz.getFullQuestion().get(i).getChoices()[numbersChosen
-										.get(picked - 1)].getChoice();
+										.get(picked - 1)].getChoiceString();
 								answers.add(answer);
 							}
 							StudentAnswersDAO sanswerdao = new StudentAnswersDAO();
@@ -1096,7 +1042,7 @@ public class Launcher {
 					QuizDAO qdao = new QuizDAO();
 					System.out.println("Enter Quiz ID");
 					int quizId = Integer.parseInt(input.nextLine());
-					;
+					
 					quizId = qdao.getQuizId(new Quiz(qdao.getTitleById(quizId)));
 					if (quizId == 0) {
 						System.out.println("Quiz not found");
@@ -1110,7 +1056,7 @@ public class Launcher {
 							System.out.println("You havent done that exam yet");
 						} else {
 							int max = rltnqqdao.totalGradeOfQuiz(fullQuiz);
-							System.out.println(student.getFirst_name() + ": " + quiz.getTitle() + " Grade = " + grade
+							System.out.println(student.getFirstName() + ": " + quiz.getTitle() + " Grade = " + grade
 									+ " / " + max);
 						}
 					}
@@ -1137,7 +1083,7 @@ public class Launcher {
 				} else if (menu2 == 4) {
 					StudentQuizDAO squizdao = new StudentQuizDAO();
 					ArrayList<FullQuiz> quizesUndone = squizdao.getStudentQuizesByGrade(student, -1);
-					if (quizesUndone.size() == 0) {
+					if (quizesUndone.isEmpty()) {
 						System.out.println("You have finished all your quizes");
 					} else {
 						int counter = 1;
