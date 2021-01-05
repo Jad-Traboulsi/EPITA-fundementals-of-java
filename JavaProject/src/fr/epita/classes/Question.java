@@ -4,7 +4,7 @@ package fr.epita.classes;
 public class Question {
 	
 	private int id;
-	private String question;
+	private String questionString;
 	private String answer;
 	private int difficulty;
 	
@@ -13,7 +13,7 @@ public class Question {
 
 	public Question(String question, String answer, int difficulty) {
 		super();
-		this.question = question;
+		this.questionString = question;
 		this.answer = answer;
 		this.difficulty = difficulty;
 	}
@@ -21,7 +21,7 @@ public class Question {
 
 	public Question(String question, String answer, int difficulty, int id) {
 		super();
-		this.question = question;
+		this.questionString = question;
 		this.answer = answer;
 		this.difficulty = difficulty;
 		this.id = id;
@@ -35,12 +35,12 @@ public class Question {
 		this.id = id;
 	}
 
-	public String getQuestion() {
-		return question;
+	public String getQuestionString() {
+		return questionString;
 	}
 
-	public void setQuestion(String question) {
-		this.question = question;
+	public void setQuestionString(String question) {
+		this.questionString = question;
 	}
 
 	public String getAnswer() {
@@ -78,17 +78,17 @@ public class Question {
 			return false;
 		if (id != other.id)
 			return false;
-		if (question == null) {
-			if (other.question != null)
+		if (questionString == null) {
+			if (other.questionString != null)
 				return false;
-		} else if (!question.equals(other.question))
+		} else if (!questionString.equals(other.questionString))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "Question [id=" + id + ", question=" + question + ", answer=" + answer + ", difficulty=" + difficulty
+		return "Question [id=" + id + ", questionString=" + questionString + ", answer=" + answer + ", difficulty=" + difficulty
 				+ "]";
 	}
 
