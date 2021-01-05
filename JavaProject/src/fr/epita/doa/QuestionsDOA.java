@@ -1,5 +1,6 @@
 package fr.epita.doa;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -8,90 +9,184 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import fr.epita.classes.Question;
+import fr.epita.services.filereader.Reader;
 
 public class QuestionsDOA {
-	String database = "jdbc:postgresql://localhost:5432/fundementals-of-java";
-	String username = "postgres";
-	String password = "";
-	public int getID(String questionTitle) throws Exception {
-		Connection connection = DriverManager.getConnection(database, username, password);
-		String toBeUpdatedQuestions = "SELECT id FROM public.\"Questions\" where lower(question) = lower(?)";
-
-		PreparedStatement prepareQuestionStatement = connection.prepareStatement(toBeUpdatedQuestions);
-		prepareQuestionStatement.setString(1, questionTitle);
-
-		ResultSet rs = prepareQuestionStatement.executeQuery();
+	Reader r = new Reader();
+	String database = r.getDatabase();
+	String username = r.getUsername();
+	String password = r.getPassword();
+	public int getID(String questionTitle){
 		int id = 0;
-		while (rs.next()) {
-			id = rs.getInt("id");
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		try {
+			connection = DriverManager.getConnection(database, username, password);
+			String str = "SELECT id FROM public.\"Questions\" where lower(question) = lower(?)";
+
+			preparedStatement = connection.prepareStatement(str);
+			preparedStatement.setString(1, questionTitle);
+
+			ResultSet rs = preparedStatement.executeQuery();
+			while (rs.next()) {
+				id = rs.getInt("id");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			if(preparedStatement!=null) {
+				try {
+					preparedStatement.close();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if(connection!=null) {
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
 		}
-		connection.close();
+		
 
 		return id;
 	}
-	public Question getQuestion(int id) throws Exception {
-		Connection connection = DriverManager.getConnection(database, username, password);
-		String query = "SELECT * FROM public.\"Questions\" where id = ?;";
-		PreparedStatement prepareQuestionStatement = connection.prepareStatement(query);
-		prepareQuestionStatement.setInt(1, id);
-		ResultSet rs = prepareQuestionStatement.executeQuery();
+	public Question getQuestion(int id){
 
 		String quest = "";
 		String answer = "";
 		int dif = 0;
-		while (rs.next()) {
-			dif = rs.getInt("difficulty");
-			quest = rs.getString("question");
-			answer = rs.getString("answer");
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		try {
+			connection = DriverManager.getConnection(database, username, password);
+			String query = "SELECT * FROM public.\"Questions\" where id = ?;";
+			preparedStatement = connection.prepareStatement(query);
+			preparedStatement.setInt(1, id);
+			ResultSet rs = preparedStatement.executeQuery();
+
+			while (rs.next()) {
+				dif = rs.getInt("difficulty");
+				quest = rs.getString("question");
+				answer = rs.getString("answer");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			if(preparedStatement!=null) {
+				try {
+					preparedStatement.close();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if(connection!=null) {
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
 		}
+		
 
 		return new Question(quest, answer, dif, id);
 	}
 
-	public ArrayList<Question> selectQuestions(Question question) throws SQLException {
+	public ArrayList<Question> selectQuestions(Question question){
 
 		ArrayList<Question> out = new ArrayList<>();
-		if (!(question.getAnswer() == "" && question.getDifficulty() == -1 && question.getQuestion() == "")) {
-			Connection connection = DriverManager.getConnection(database, username, password);
-			String query = "SELECT * FROM public.\"Questions\" where ";
+		if (!(question.getAnswer().equals("") && question.getDifficulty() == -1 && question.getQuestionString().equals(""))) {
+			Connection connection = null;
+			PreparedStatement prepareQuestionStatement = null;
+			try {
+				connection = DriverManager.getConnection(database, username, password);
+				String query = "SELECT * FROM public.\"Questions\" where ";
 
-			// check what values are to be updated
-			boolean[] areHere = new boolean[3];
-			for (int i = 0; i < 3; i++) {
-				areHere[i] = false;
-			}
-			// check for nulls and adding to query
-			if (question.getAnswer() != "") {
-				areHere[0] = true;
-				query += "lower(answer) = lower(?) and ";
-			}
-			if (question.getQuestion() != "") {
-				areHere[1] = true;
-				query += "lower(question) = lower(?) and ";
-			}
-			if (question.getDifficulty() != -1) {
-				areHere[2] = true;
-				query += "difficulty = ? and ";
-			}
-			query = query.substring(0, query.length() - 4);
-			query += ";";
-			PreparedStatement prepareQuestionStatement = connection.prepareStatement(query);
-			int count = 1;
-			if (areHere[0]) {
-				prepareQuestionStatement.setString(count, question.getAnswer());
-				count++;
-			}
-			if (areHere[1]) {
-				prepareQuestionStatement.setString(count, question.getQuestion());
-				count++;
-			}
-			if (areHere[2]) {
-				prepareQuestionStatement.setInt(count, question.getDifficulty());
-				count++;
-			}
+				// check what values are to be updated
+				boolean[] areHere = new boolean[3];
+				for (int i = 0; i < 3; i++) {
+					areHere[i] = false;
+				}
+				// check for nulls and adding to query
+				if (!question.getAnswer().equals("")) {
+					areHere[0] = true;
+					query += "lower(answer) = lower(?) and ";
+				}
+				if (!question.getQuestionString().equals("")) {
+					areHere[1] = true;
+					query += "lower(question) = lower(?) and ";
+				}
+				if (question.getDifficulty() != -1) {
+					areHere[2] = true;
+					query += "difficulty = ? and ";
+				}
+				query = query.substring(0, query.length() - 4);
+				query += ";";
+				prepareQuestionStatement = connection.prepareStatement(query);
+				int count = 1;
+				if (areHere[0]) {
+					prepareQuestionStatement.setString(count, question.getAnswer());
+					count++;
+				}
+				if (areHere[1]) {
+					prepareQuestionStatement.setString(count, question.getQuestionString());
+					count++;
+				}
+				if (areHere[2]) {
+					prepareQuestionStatement.setInt(count, question.getDifficulty());
+					
+				}
 
+				ResultSet rs = prepareQuestionStatement.executeQuery();
+
+				int id = 0;
+				String quest = "";
+				String answer = "";
+				int dif = 0;
+				while (rs.next()) {
+					id = rs.getInt("id");
+					dif = rs.getInt("difficulty");
+					quest = rs.getString("question");
+					answer = rs.getString("answer");
+					out.add(new Question(quest, answer, dif, id));
+				}
+			} catch (Exception e) {
+
+				e.printStackTrace();
+			}finally {
+				if(prepareQuestionStatement!=null) {
+					try {
+						prepareQuestionStatement.close();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
+				if(connection!=null) {
+					try {
+						connection.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			
+		}
+		return out;
+	}
+	public ArrayList<Question> getAllQuestions(){
+
+		ArrayList<Question> out = new ArrayList<>();
+		PreparedStatement prepareQuestionStatement = null;
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(database, username, password);
+			String query = "SELECT * FROM public.\"Questions\" ";
+
+			prepareQuestionStatement = connection.prepareStatement(query);
 			ResultSet rs = prepareQuestionStatement.executeQuery();
-
 			int id = 0;
 			String quest = "";
 			String answer = "";
@@ -103,98 +198,131 @@ public class QuestionsDOA {
 				answer = rs.getString("answer");
 				out.add(new Question(quest, answer, dif, id));
 			}
-			connection.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			if(prepareQuestionStatement!=null) {
+				try {
+					prepareQuestionStatement.close();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if(connection!=null) {
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
 		}
-		return out;
-	}
-	public ArrayList<Question> getAllQuestions() throws SQLException {
-
-		ArrayList<Question> out = new ArrayList<>();
-
-		Connection connection = DriverManager.getConnection(database, username, password);
-		String query = "SELECT * FROM public.\"Questions\" ";
-
-		PreparedStatement prepareQuestionStatement = connection.prepareStatement(query);
-		ResultSet rs = prepareQuestionStatement.executeQuery();
-		int id = 0;
-		String quest = "";
-		String answer = "";
-		int dif = 0;
-		while (rs.next()) {
-			id = rs.getInt("id");
-			dif = rs.getInt("difficulty");
-			quest = rs.getString("question");
-			answer = rs.getString("answer");
-			out.add(new Question(quest, answer, dif, id));
-		}
-		connection.close();
+		
 
 		return out;
 	}
 
-	public void createQuestion(Question questionWanted) throws Exception {
+	public void createQuestion(Question questionWanted) throws IOException {
 
-		int id = getID(questionWanted.getQuestion());
+		int id = getID(questionWanted.getQuestionString());
 
 		if (id != 0) {
 
 			System.out.println("Question already exists");
-		} else if (questionWanted.getQuestion() == "") {
-			throw new Exception("Question cannot be empty");
+		} else if (questionWanted.getQuestionString().equals("")) {
+			throw new IOException("Question cannot be empty");
 
-		} else if (questionWanted.getAnswer() == "") {
-			throw new Exception("Answer cannot be empty");
+		} else if (questionWanted.getAnswer().equals("")) {
+			throw new IOException("Answer cannot be empty");
 
 		} else if (questionWanted.getDifficulty() == -1) {
-			throw new Exception("Difficulty cannot be -1");
+			throw new IOException("Difficulty cannot be -1");
 		}else {
 
 				// inserting in table question
-				Connection connection = DriverManager.getConnection(database, username, password);
+			Connection connection = null;
+			PreparedStatement prepareStatement1 = null;
+			try {
+				connection = DriverManager.getConnection(database, username, password);
 				String query1 = "INSERT INTO public.\"Questions\"(question, answer, difficulty)VALUES (?, ?, ?); ";
-				PreparedStatement prepareStatement1 = connection.prepareStatement(query1);
-				prepareStatement1.setString(1, questionWanted.getQuestion());
+				prepareStatement1 = connection.prepareStatement(query1);
+				prepareStatement1.setString(1, questionWanted.getQuestionString());
 				prepareStatement1.setString(2, questionWanted.getAnswer());
 				prepareStatement1.setInt(3, questionWanted.getDifficulty());
 				prepareStatement1.execute();
-				connection.close();
-	
 				System.out.println("Question Created");
+			}catch (Exception e) {
+				e.printStackTrace();
+			}finally {
+				if(prepareStatement1!=null) {
+					try {
+						prepareStatement1.close();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
+				if(connection!=null) {
+					try {
+						connection.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+				
+	
+				
 		}
 		
 
 	}
 
-	public void deleteQuestion(Question questionWanted) throws Exception {
+	public void deleteQuestion(Question questionWanted) throws IOException {
 
-		int id = getID(questionWanted.getQuestion());
+		int id = getID(questionWanted.getQuestionString());
 
 		// check if question exists
 		if (id == 0) {
 
-			throw new Exception("Question not found");
+			throw new IOException("Question not found");
 		}
 		// delete question
 		else {
-			Connection connection = DriverManager.getConnection(database, username, password);
+			PreparedStatement preparedStatement = null;
+			Connection connection = null;
+			try {
+				connection = DriverManager.getConnection(database, username, password);
 
-			String str = "DELETE FROM public.\"Questions\" WHERE id = " + id + ";";
-			PreparedStatement preparedStatement = connection.prepareStatement(str);
-			preparedStatement.executeUpdate();
-			connection.close();
-			System.out.println("Question Deleted");
+				String str = "DELETE FROM public.\"Questions\" WHERE id = " + id + ";";
+				preparedStatement = connection.prepareStatement(str);
+				preparedStatement.executeUpdate();
+				System.out.println("Question Deleted");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}finally {
+				if(preparedStatement!=null) {
+					try {
+						preparedStatement.close();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
+				if(connection!=null) {
+					try {
+						connection.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			
 		}
 	}
 
-	public void updateQuestion(Question question, Question newQuestion) throws Exception {
-		if (question.getQuestion() != "") {
+	public void updateQuestion(Question question, Question newQuestion){
+		if (!question.getQuestionString().equals("")) {
 			
-			int oldId = getID(question.getQuestion());
-			int newId = getID(newQuestion.getQuestion());
-			Question oldQuestion = new Question();
-			if (oldId != 0) {
-				oldQuestion = getQuestion(oldId);
-			}
+			int oldId = getID(question.getQuestionString());
+			int newId = getID(newQuestion.getQuestionString());
 			// no id found
 			if (oldId == 0) {
 				System.out.println("Question not found");
@@ -203,60 +331,70 @@ public class QuestionsDOA {
 			else if (newId != 0) {
 				System.out.println("New Question already Exists");
 			}
-			// check if choice update needed
-			else if ((oldQuestion.getAnswer().toLowerCase().equals(newQuestion.getAnswer().toLowerCase())
-					&& newQuestion.getQuestion().equals(""))
-					&& (oldQuestion.getQuestion().toLowerCase().equals(newQuestion.getQuestion().toLowerCase())
-							&& newQuestion.getQuestion().equals(""))
-					&& (oldQuestion.getDifficulty() == newQuestion.getDifficulty()
-							&& newQuestion.getDifficulty() == -1)) {
-				System.out.println("No Question Changed");
-			}
-			// update choice
+			// update question
 			else {
+				PreparedStatement prepareQuestionStatement = null;
+				Connection connection = null;
+				try {
+					connection = DriverManager.getConnection(database, username, password);
+					String toBeUpdatedQuestions = "UPDATE public.\"Questions\" set ";
 
-				Connection connection = DriverManager.getConnection(database, username, password);
-				String toBeUpdatedQuestions = "UPDATE public.\"Questions\" set ";
+					// check what values are to be updated
+					boolean[] areHere = new boolean[3];
+					for (int i = 0; i < 3; i++) {
+						areHere[i] = false;
+					}
+					// check for nulls and adding to query
+					if (!newQuestion.getAnswer().equals("")) {
+						areHere[0] = true;
+						toBeUpdatedQuestions += "answer = ?, ";
+					}
+					if (!newQuestion.getQuestionString().equals("")) {
+						areHere[1] = true;
+						toBeUpdatedQuestions += "question = ?, ";
+					}
+					if (newQuestion.getDifficulty() != -1) {
+						areHere[2] = true;
+						toBeUpdatedQuestions += "difficulty = ?, ";
+					}
+					toBeUpdatedQuestions = toBeUpdatedQuestions.substring(0, toBeUpdatedQuestions.length() - 2);
+					toBeUpdatedQuestions = toBeUpdatedQuestions + " where id = " + oldId + ";";
+					prepareQuestionStatement = connection.prepareStatement(toBeUpdatedQuestions);
+					int count = 1;
+					if (areHere[0]) {
+						prepareQuestionStatement.setString(count, newQuestion.getAnswer());
+						count++;
+					}
+					if (areHere[1]) {
+						prepareQuestionStatement.setString(count, newQuestion.getQuestionString());
+						count++;
+					}
+					if (areHere[2]) {
+						prepareQuestionStatement.setInt(count, newQuestion.getDifficulty());
+					}
 
-				// check what values are to be updated
-				boolean[] areHere = new boolean[3];
-				for (int i = 0; i < 3; i++) {
-					areHere[i] = false;
-				}
-				// check for nulls and adding to query
-				if (newQuestion.getAnswer() != "") {
-					areHere[0] = true;
-					toBeUpdatedQuestions += "answer = ?, ";
-				}
-				if (newQuestion.getQuestion() != "") {
-					areHere[1] = true;
-					toBeUpdatedQuestions += "question = ?, ";
-				}
-				if (newQuestion.getDifficulty() != -1) {
-					areHere[2] = true;
-					toBeUpdatedQuestions += "difficulty = ?, ";
-				}
-				toBeUpdatedQuestions = toBeUpdatedQuestions.substring(0, toBeUpdatedQuestions.length() - 2);
-				toBeUpdatedQuestions = toBeUpdatedQuestions + " where id = " + oldId + ";";
-				PreparedStatement prepareQuestionStatement = connection.prepareStatement(toBeUpdatedQuestions);
-				int count = 1;
-				if (areHere[0]) {
-					prepareQuestionStatement.setString(count, newQuestion.getAnswer());
-					count++;
-				}
-				if (areHere[1]) {
-					prepareQuestionStatement.setString(count, newQuestion.getQuestion());
-					count++;
-				}
-				if (areHere[2]) {
-					prepareQuestionStatement.setInt(count, newQuestion.getDifficulty());
-					count++;
-				}
+					prepareQuestionStatement.execute();
 
-				prepareQuestionStatement.execute();
-				connection.close();
-
-				System.out.println("Question Updated");
+					System.out.println("Question Updated");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}finally {
+					if(prepareQuestionStatement!=null) {
+						try {
+							prepareQuestionStatement.close();
+						} catch (SQLException e1) {
+							e1.printStackTrace();
+						}
+					}
+					if(connection!=null) {
+						try {
+							connection.close();
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+				
 			}
 
 		} else {
