@@ -1,28 +1,28 @@
 package fr.epita.classes;
 
 public class Choice {
-	private String choice;	
+	private String choiceString;	
 	private int id;
 	public Choice() {
 	}
 
 	public Choice(String choice) {
 		super();
-		this.choice = choice;
+		this.choiceString = choice;
 	}
 	public Choice(String choice,int id) {
 		super();
-		this.choice = choice;
+		this.choiceString = choice;
 		this.id = id;
 	}
 	
 
-	public String getChoice() {
-		return choice;
+	public String getChoiceString() {
+		return choiceString;
 	}
 
-	public void setChoice(String choice) {
-		this.choice = choice;
+	public void setChoiceString(String choice) {
+		this.choiceString = choice;
 	}
 
 	public int getId() {
@@ -42,10 +42,10 @@ public class Choice {
 		if (getClass() != obj.getClass())
 			return false;
 		Choice other = (Choice) obj;
-		if (choice == null) {
-			if (other.choice != null)
+		if (choiceString == null) {
+			if (other.choiceString != null)
 				return false;
-		} else if (!choice.equals(other.choice))
+		} else if (!choiceString.equals(other.choiceString))
 			return false;
 		if (id != other.id)
 			return false;
@@ -54,7 +54,7 @@ public class Choice {
 
 	@Override
 	public String toString() {
-		return "Choice [choice=" + choice + ", id=" + id + "]";
+		return "Choice [choiceString=" + choiceString + ", id=" + id + "]";
 	}
 
 
