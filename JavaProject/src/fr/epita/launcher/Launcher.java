@@ -541,7 +541,7 @@ public class Launcher {
 					System.out.println("4- Get All Quizes");
 					System.out.println("5- Get student grade to quiz");
 					System.out.println("6- Get all grades to quiz");
-					System.out.println("7- Get all students who didn't finish their quizes");
+					System.out.println("7- Get all students who didn't do specific quiz");
 					System.out.println("8- Get average of quiz");
 					System.out.println("9- Get all quizes of specific student");
 					System.out.println("10- Exit");
@@ -557,7 +557,7 @@ public class Launcher {
 						System.out.println("4- Get All Quizes");
 						System.out.println("5- Get student grade to quiz");
 						System.out.println("6- Get all grades to quiz");
-						System.out.println("7- Get all students who didn't finish their quizes");
+						System.out.println("7- Get all students who didn't do specific quiz");
 						System.out.println("8- Get average of quiz");
 						System.out.println("9- Get all quizes of specific student");
 						System.out.println("10- Exit");
@@ -834,7 +834,6 @@ public class Launcher {
 							if (count == 0) {
 								System.out.println("No one did this quiz");
 							} else {
-								System.out.println("Total = " + total);
 								System.out.println("Average = " + total / count);
 							}
 
@@ -887,12 +886,10 @@ public class Launcher {
 							int counterDone = 0;
 							int counterUndone = 0;
 							while (keys.hasMoreElements()) {
-								String out = "";
 								FullQuiz key = keys.nextElement();
 								String title = key.getQuiz().getTitle();
 								if (allQuizesAndGrades.get(key) != -1) {
-									out += counterDone + ". " + title + ": Grade: " + allQuizesAndGrades.get(key);
-									System.out.println(out);
+									System.out.println(counterDone + ". " + title + ": Grade: " + allQuizesAndGrades.get(key));
 									counterDone += 1;
 								} else {
 									System.out.println(counterUndone + ". " + title + " UNDONE");
