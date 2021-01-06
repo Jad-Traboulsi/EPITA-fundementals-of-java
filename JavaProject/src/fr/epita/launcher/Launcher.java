@@ -107,7 +107,7 @@ public class Launcher {
 
 						RelationQuestionDAO rltndao = new RelationQuestionDAO();
 						QuestionsDOA questiondao = new QuestionsDOA();
-						System.out.println("Which question you want to modify?");
+						System.out.println("  you want to modify?");
 						System.out.println("Enter question ID");
 						int id = Integer.parseInt(input.nextLine());
 
@@ -644,7 +644,7 @@ public class Launcher {
 											break;
 										}
 									}
-								}
+								} 
 
 								System.out.println("Enter Answer");
 								String answer = input.nextLine();
@@ -755,8 +755,14 @@ public class Launcher {
 								FullQuiz fq = rltqqdao.getQuiz(quizFound);
 								int totalQuizGrade = rltqqdao.totalGradeOfQuiz(fq);
 								if (sqdao.isPresent(studentFound, fq)) {
+									int grade = sqdao.getGrade(studentFound, fq);
+									if(grade!=-1) {
 									System.out.println(studentFound.getFirstName() + ": Quiz :" + quizFound.getId()
-											+ " Grade: " + sqdao.getGrade(studentFound, fq) + "/" + totalQuizGrade);
+											+ " Grade: " + grade + "/" + totalQuizGrade);
+									}
+									else {
+										System.out.println(studentFound.getFirstName() + " didn't do the quiz yet");
+									}
 								} else {
 									System.out.println("Quiz not related to Student");
 								}
